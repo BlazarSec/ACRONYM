@@ -18,6 +18,8 @@ class Core():
 class Module:
     pass
 
-# load components from package dir and return as ({"name": component, } [errors])
-def load_from():
-    return {}
+# load components from package dir and return as ({"name": Component} [errors])
+def load_from(package_dir):
+    loaded = {}
+    errors = []
+    return (loaded, errors)
