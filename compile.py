@@ -50,6 +50,7 @@ def build_main(sample):
 
     reclose = re.compile(r"{<close>}")
 
+    reclean = re.compile(r"([ ]*\n[ ]*){2,}", re.MULTILINE)
 
     with open("packages/main.c.template") as main_file:
         cmain = main_file.read()
@@ -77,6 +78,9 @@ def build_main(sample):
         cmain = resbreak.sub("", cmain)
         cmain = reebreak.sub("", cmain)
         cmain = rebreak.sub(cbreak, cmain)
+
+    cmain = reclean.sub("\n", cmain)
+
     return cmain
 
 def print_sample(sample):
