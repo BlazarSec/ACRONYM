@@ -90,6 +90,8 @@ def print_sample(sample):
         print("    files: {}".format(", ".join(sample[p])))
 
 if __name__ == "__main__":
+    #if you want to run this directly make sure to run it from the root of the repo
+    #./src/conpilw.py
     packages = get_packages()
     sample = build_sample(packages)
     print_sample(sample)
