@@ -50,19 +50,21 @@ def build_main(sample):
 
     reclose = re.compile(r"{<close>}")
 
-    reclean = re.compile(r"([ ]*\n[ ]*){2,}", re.MULTILINE)
-
     with open("packages/main.c.template") as main_file:
         cmain = main_file.read()
 
     for p in sample:
         csamp = sample[p]
         #collect and join includes
-        cincludes += "\n".join(["#include \"{}/{}\"".format(p, h) for h in sample[p] if h[-2:] == ".h"])
+        cincludes += "\n".join(["#include \"{}/{}\"\n".format(p, h) for h in sample[p] if h[-2:] == ".h"])
         if "init.h" in sample[p]:
             cinit += "{}_init();\n".format(p)
         if "break.h" in sample[p]:
-            cbreak += "{}_break();\n".format(p)
+            cbreak += """
+        if (!{}_break()) {{
+            break;
+        }}
+""".format(p)
         if "close.h" in sample[p]:
             cclose += "{}_close();\n".format(p)
 
@@ -78,8 +80,6 @@ def build_main(sample):
         cmain = resbreak.sub("", cmain)
         cmain = reebreak.sub("", cmain)
         cmain = rebreak.sub(cbreak, cmain)
-
-    cmain = reclean.sub("\n", cmain)
 
     return cmain
 
