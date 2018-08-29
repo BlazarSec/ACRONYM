@@ -8,19 +8,22 @@ import sys
 import getopt
 from os.path import dirname, realpath
 
-import templates
 import cli
+import sample
+import templates
 
 # usage info
 def usage():
-    print("acroym - A Cool Red-Operative Network Yeeting Multitool")
-    print("Usage:")
-    print(" acronym [options] :: launch acronym")
-    print(" acronym [options] <sample> :: launch acronym and load saved <sample>")
-    print("")
-    print("Options:")
-    print(" -h --help :: this")
-    print(" -d --dir <dir> :: load initial packages from <dir> instead of acronym/packages/")
+    print(
+        "acroym - A Cool Red-Operative Network Yeeting Multitool"
+        "Usage:"
+        " acronym [options] :: launch acronym"
+        " acronym [options] <sample> :: launch acronym and load saved <sample>"
+        ""
+        "Options:"
+        " -h --help :: this"
+        " -d --dir <dir> :: load initial packages from <dir> instead of acronym/packages/"
+    )
 
 # handle options/arguments and initialize CLI
 def main():
@@ -31,7 +34,7 @@ def main():
         print(e, end="\n\n")
         usage()
         sys.exit(-1)
-    
+
     # default values
     #TODO try/except block this for folder not found or unreadable
     init_local_packages = dirname(realpath(__file__))+"/../packages"
@@ -45,21 +48,29 @@ def main():
         if opt in ["-d", "--dir"]:
             init_local_packages = val
 
-    # handle args
+    # instantiate CLI
+    instance = None
+
     if args:
         if len(args) != 1:
             print("wrong number of args: requires 0 or 1, got " + len(args), end="\n\n")
             usage()
             sys.exit(-1)
         
-        #TODO allow dumping of samples as python pickles, and reconstruction of samples from pickles
-        print("[$] Warning: saved sample loading not yet implemented")
+        try:
+            instance = cli.Instance(init_local_packages, sample=sample.unpickle_from(args[0]))
+            print("[*] Loaded '{}'".format(args[0]))
 
-    # instantiate CLI and handle commands
-    instance = cli.Instance(init_local_packages)
+        except Exception as e:
+            print("[!] An error occurred while attempting to load {}:\n{}", args[0], e)
+            sys.exit(-1)
+    else:
+        instance = cli.Instance(init_local_packages)
+        print("[*] No sample specified - initialized blank sample")
 
+    # read lines from stdin and feed to CLI instance
     while True:
-        command = input(" > ").split(" ")
+        command = input(" > ").strip().split(" ")
 
         if len(command[0]):
             instance.try_run(command)

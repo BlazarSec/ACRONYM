@@ -5,11 +5,12 @@ Contains utils for mapping runnable commands into memory and execing commands fr
 from inspect import getmembers, isfunction
 from os import listdir
 
+import sample
 import templates
 
 class Instance():
     # instantiate, loading initial packages
-    def __init__(self, init_local_packages):
+    def __init__(self, init_local_packages, sample=sample.Sample()):
         # load initial packages, indexable by string
         # {"package_name": {"component_name": templates.Component}}
         packages = {}
@@ -26,6 +27,9 @@ class Instance():
             packages[package_dir] = loaded
 
         self.packages = packages
+
+        # load sample, or else initialize blank sample
+        self.sample = sample
 
         # load commands
         self.commands = { name: fn for name, fn in _loadcmds_() }
