@@ -1,0 +1,8 @@
+{
+    "name": "helloworld",
+    "includes": [
+        "helloworld.h"
+    ],
+    "init":"helloworld_init",
+    "event_handlers": []
+}

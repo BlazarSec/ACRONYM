@@ -2,13 +2,6 @@
 
 int main (int argc, char ** argv) {
     {<init>}
-
-    {<?break>}
-    while(1) {
-        {<break>}
-    }
-    {<!break>}
-
     {<close>}
 }
 

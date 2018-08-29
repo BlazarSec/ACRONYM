@@ -4,6 +4,7 @@
 from os import listdir
 from os.path import isfile, isdir, join
 import re
+import json
 
 def get_packages():
     ppath = "packages"
@@ -15,13 +16,26 @@ def get_packages():
     return alldirs
 
 def parse_package(folder):
-    ppath = join("packages",folder)
+    ppath = join(join("packages",folder), "package.json")
 
-    full_listing = listdir(ppath)
+    #this is the template for package.json
+    """
+{
+    "name": "helloworld",
+    "includes": [
+        "helloworld.h"
+    ],
+    "init":"",
+    "close":"",
+    "event_handlers": []
+}
+"""
 
-    allfiles = [f for f in full_listing if isfile(join(ppath, f))]
+    package = None
+    with open(ppath, "r") as pfile:
+        package = json.load(pfile)
 
-    return allfiles
+    return package
 
 def build_sample(packages):
     sample = {}
@@ -31,7 +45,6 @@ def build_sample(packages):
     return sample
 
 def build_main(sample):
-    #TODO generalize the regex to be based on dictionary lookups for any file
     cincludes = ""
     cinit = ""
     cbreak = ""
@@ -43,11 +56,6 @@ def build_main(sample):
 
     reinit = re.compile(r"{<init>}")
 
-    rebreak = re.compile(r"{<break>}")
-    rebreakaround = re.compile(r"^[ ]*{<\?break>}(.|\n)*{<!break>}$", re.MULTILINE)
-    resbreak = re.compile(r"{<\?break>}")
-    reebreak = re.compile(r"{<!break>}")
-
     reclose = re.compile(r"{<close>}")
 
     with open("packages/main.c.template") as main_file:
@@ -56,30 +64,16 @@ def build_main(sample):
     for p in sample:
         csamp = sample[p]
         #collect and join includes
-        cincludes += "\n".join(["#include \"{}/{}\"\n".format(p, h) for h in sample[p] if h[-2:] == ".h"])
-        if "init.h" in sample[p]:
-            cinit += "{}_init();\n".format(p)
-        if "break.h" in sample[p]:
-            cbreak += """
-        if (!{}_break()) {{
-            break;
-        }}
-""".format(p)
-        if "close.h" in sample[p]:
-            cclose += "{}_close();\n".format(p)
+        cincludes += "\n".join(["#include \"{}/{}\"\n".format(p, h) for h in sample[p]["includes"]])
+        if "init" in sample[p]:
+            cinit += "{}();".format(sample[p]["init"])
+        if "close" in sample[p]:
+            cclose += "{}();".format(sample[p]["close"])
 
     #simple replacement of includes, init, and cleanup
     cmain = reincludes.sub(cincludes, cmain)
     cmain = reinit.sub(cinit, cmain)
     cmain = reclose.sub(cclose, cmain)
-
-    #if there are no breaks, remove the loop
-    if len(cbreak) == 0:
-        cmain = rebreakaround.sub("", cmain)
-    else:
-        cmain = resbreak.sub("", cmain)
-        cmain = reebreak.sub("", cmain)
-        cmain = rebreak.sub(cbreak, cmain)
 
     return cmain
 
