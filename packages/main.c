@@ -10,6 +10,7 @@ int broadcast_total_types = 1;
 int* broadcast_type_totals;
 
 int main(int argc, char** argv) {
+    //TODO generate mallocs and frees from selected packages
     broadcast_callbacks = malloc(sizeof(void (**)(const broadcast_msg_t*)));
     broadcast_callbacks[0] = malloc(sizeof(void (*)(const broadcast_msg_t*)));
     broadcast_callbacks[0][0] = &test;
