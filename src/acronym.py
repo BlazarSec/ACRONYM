@@ -15,13 +15,13 @@ import templates
 # usage info
 def usage():
     print(
-        "acroym - A Cool Red-Operative Network Yeeting Multitool"
-        "Usage:"
-        " acronym [options] :: launch acronym"
-        " acronym [options] <sample> :: launch acronym and load saved <sample>"
-        ""
-        "Options:"
-        " -h --help :: this"
+        "acroym - A Cool Red-Operative Network Yeeting Multitool\n"
+        "Usage:\n"
+        " acronym [options] :: launch acronym\n"
+        " acronym [options] <sample> :: launch acronym and load saved <sample>\n"
+        "\n"
+        "Options:\n"
+        " -h --help :: this\n"
         " -d --dir <dir> :: load initial packages from <dir> instead of acronym/packages/"
     )
 
@@ -49,6 +49,7 @@ def main():
             init_local_packages = val
 
     # instantiate CLI
+     
     instance = None
 
     if args:
