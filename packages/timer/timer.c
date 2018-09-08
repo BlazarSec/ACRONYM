@@ -21,7 +21,6 @@ void* tick(void* param(void)) {
 }
 
 void timer_init() {
-    void* ret;
     pthread_t th_id;
     pthread_attr_t attr;
     pthread_attr_init(&attr);

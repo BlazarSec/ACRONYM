@@ -14,7 +14,8 @@ typedef struct {
     } extra;
 } broadcast_msg_t;
 
-//TODO write the init that waits on CV signals to consume the queue and broadcast the async signals, probably a seperate thread
+void broadcast_init();
+void broadcast_close();
 
 //blocking call avoid use
 //  ie for critical messages
