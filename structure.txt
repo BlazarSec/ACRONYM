@@ -1,0 +1,31 @@
+Front end structure:
+
+The src directory contains the CLI front-end master script, acronym.py,
+along with the modules that acronym.py depends on. Each module is
+structured as a folder where the primary file contains the abstractions
+provided by the module. The utilities that the abstractions depend on are
+sorted into supplementary modules imported by the primary file.
+Supplementary modules including content that may be meant for standalone
+use outside the module are named normally, whereas supplementary modules
+NOT meant for use outside the module are named with a single underscore
+on each side of the module name, ex: "_module.py_" / "_module_"
+
+Abstraction modules are provided as follows:
+    cli - The live interface. A instance of the interface stores the live
+          sample being worked on, the loaded packages available for use,
+          and the commands available to be run.
+    
+    samples - Abstractions for samples being edited in real time. A sample
+              instance may contain one or more components and tracks the
+              relationship between them, so that a sample can be "built,"
+              producing the intial source-code for a real malware sample.
+    
+    templates - Abstractions for translation between loaded packages whose
+                components can be added to live samples and worked with,
+                and templated packages on disk.
+
+    compile - structured script for building of samples on disk.
+              compile.py is runnable as a standalone script so
+              that a previously prepared sample may be built
+              without having to load the entire frontend, if
+              only building is desired.
