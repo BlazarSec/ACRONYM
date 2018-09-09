@@ -24,8 +24,5 @@ Abstraction modules are provided as follows:
                 components can be added to live samples and worked with,
                 and templated packages on disk.
 
-    compile - structured script for building of samples on disk.
-              compile.py is runnable as a standalone script so
-              that a previously prepared sample may be built
-              without having to load the entire frontend, if
-              only building is desired.
+    compile - Provides means of building samples onto disk as live source
+              code.
