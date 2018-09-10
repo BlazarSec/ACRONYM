@@ -7,8 +7,6 @@
 
 {<broadcast_constants>}
 
-{<broadcast_type_totals>}
-
 void (***broadcast_callbacks)(const broadcast_msg_t* msg);
 
 int main(int argc, char** argv) {
