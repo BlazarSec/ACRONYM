@@ -20,10 +20,13 @@ void broadcast_close();
 //blocking call avoid use
 //  ie for critical messages
 void broadcast_msg(const broadcast_msg_t msg);
+
 //non blocking
-//
+//  prefer this method
 int broadcast_queue_msg(const broadcast_msg_t msg);
 
+
+//defined by python compile step
 extern int broadcast_total_types;
-extern int *broadcast_type_totals;
+extern int broadcast_type_totals[];
 extern void (***broadcast_callbacks)(const broadcast_msg_t* msg);

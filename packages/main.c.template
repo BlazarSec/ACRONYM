@@ -1,7 +1,36 @@
+#include "broadcast.h"
+
 {<includes>}
 
+{<broadcast_constants>}
+
 int main (int argc, char ** argv) {
-    {<init>}
-    {<close>}
+    broadcast_init();
+
+{<broadcast_type_totals>}
+
+    broadcast_callbacks = malloc(sizeof(void (**)(const broadcast_msg_t*))*broadcast_total_types);
+
+{<broadcast_callback_assignment>}
+
+    //for (int i = 0; i < broadcast_total_types; ++i) {
+    //    broadcast_callbacks[i] = malloc(sizeof(void (*)(const broadcast_msg_t*))*broadcast_type_totals[i]);
+    //    //TODO insert handler assertions to types in the callback
+    //    //broadcast_callbacks[i][0] = &handler
+    //}
+
+{<init>}
+
+    while (1)
+        usleep(1000);
+
+{<close>}
+
+    broadcast_close();
+
+    for (int i = 0; i < broadcast_total_types; ++i) {
+        free(broadcast_callbacks[i]);
+    }
+    free(broadcast_callbacks);
 }
 

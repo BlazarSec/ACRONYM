@@ -15,7 +15,9 @@ void* tick(void* param(void)) {
             perror("nanosleep failed!");
             break;
         }
-        //TODO broadcast the timer message
+        broadcast_msg_t msg;
+        msg.type = broadcast_type_timer;
+        broadcast_queue_msg(msg);
     }
     return 0;
 }

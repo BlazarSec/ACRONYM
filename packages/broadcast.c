@@ -34,6 +34,7 @@ void* broadcast_handler(void* param) {
         }
         pthread_mutex_unlock(&queue_mut);
     }
+    return 0;
 }
 
 void broadcast_init() {
