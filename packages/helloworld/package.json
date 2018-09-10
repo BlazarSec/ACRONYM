@@ -4,5 +4,9 @@
         "helloworld.h"
     ],
     "init":"helloworld_init",
-    "event_handlers": []
+    "events": {
+        "handled":{
+            "timer": "helloworld_handler"
+        }
+    }
 }
