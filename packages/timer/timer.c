@@ -6,7 +6,7 @@
 #include "../broadcast.h"
 #include "timer.h"
 
-void* tick(void* param(void)) {
+void* tick(void* param) {
     struct timespec tim, tim2;
     tim.tv_sec  = 1;
     tim.tv_nsec = 0;
@@ -26,6 +26,6 @@ void timer_init() {
     pthread_t th_id;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    pthread_create(th_id, &attr, tick, 0);
+    pthread_create(&th_id, &attr, tick, 0);
     pthread_detach(th_id);
 }

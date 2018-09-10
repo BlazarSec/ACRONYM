@@ -58,7 +58,6 @@ def build_main(sample):
     cclose = ""
 
     cbroadcast_constants = ""
-    cbroadcast_type_totals = ""
     cbroadcast_callback_assignment = ""
 
     #the regex replacement of the main template
@@ -99,27 +98,27 @@ def build_main(sample):
     #TODO check if it works with an event producer and consumber mismatch occurs
     total_events = len(handled_events);
 
-    cbroadcast_constants += "int broadcast_total_types = {};".format(total_events)
+    cbroadcast_constants += "int broadcast_total_types = {};\n".format(total_events)
 
     event_type = 0;
     for gevent in generated_events:
         generated_events[gevent] = len(handled_events[gevent])
-        cbroadcast_constants += "int broadcast_type_{} = {};".format(gevent, event_type)
+        cbroadcast_constants += "int broadcast_type_{} = {};\n".format(gevent, event_type)
         event_type += 0
 
-    cbroadcast_type_totals = """
-    broadcast_type_totals = {{
-        {}
-    }};
-    """.format(",\n        ".join(str(len(handled_events[h])) for h in handled_events))
+    cbroadcast_constants += """
+int broadcast_type_totals[] = {{
+    {}
+}};
+    """.format(",\n    ".join(str(len(handled_events[h])) for h in handled_events))
 
     event_type = 0;
     for gevent in generated_events:
-        cbroadcast_callback_assignment += "    broadcast_callback[{}] = malloc(sizeof(void (*)(const broadcast_msg_t*))*broadcast_type_totals[{}]);\n".format(event_type, event_type)
+        cbroadcast_callback_assignment += "    broadcast_callbacks[{}] = malloc(sizeof(void (*)(const broadcast_msg_t*))*broadcast_type_totals[{}]);\n".format(event_type, event_type)
 
         type_specific = 0
         for callback in handled_events[gevent]:
-            cbroadcast_callback_assignment += "    broadcast_callback[{}][{}] = {};\n".format(event_type, type_specific, callback);
+            cbroadcast_callback_assignment += "    broadcast_callbacks[{}][{}] = {};\n".format(event_type, type_specific, callback);
             type_specific += 1;
 
         event_type += 1;
@@ -131,7 +130,6 @@ def build_main(sample):
 
     #replacement of broadcast system
     cmain = rebroadcast_constants.sub(cbroadcast_constants, cmain)
-    cmain = rebroadcast_type_totals.sub(cbroadcast_type_totals, cmain)
     cmain = rebroadcast_callback_assignment.sub(cbroadcast_callback_assignment, cmain)
 
     return cmain

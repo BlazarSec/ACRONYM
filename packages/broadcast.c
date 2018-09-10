@@ -1,6 +1,8 @@
+#include <errno.h>
 #include <fcntl.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdio.h>
 #include <sys/stat.h>
 
 #include "broadcast.h"
@@ -47,13 +49,14 @@ void broadcast_init() {
     pthread_t th_id;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-    pthread_create(th_id, &attr, broadcast_handler, 0);
+    pthread_create(&th_id, &attr, broadcast_handler, 0);
     pthread_detach(th_id);
 }
 
 void broadcast_close() {
     sem_close(&queue_sem);
-    pthread_mutex_close();
+    pthread_mutex_destroy(&queue_mut);
+    pthread_mutex_destroy(&broadcast_mut);
 }
 
 void broadcast_msg(const broadcast_msg_t msg) {

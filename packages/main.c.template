@@ -1,17 +1,24 @@
+#include <time.h>
+#include <stdlib.h>
+
 #include "broadcast.h"
 
 {<includes>}
 
 {<broadcast_constants>}
 
-int main (int argc, char ** argv) {
-    broadcast_init();
-
 {<broadcast_type_totals>}
 
-    broadcast_callbacks = malloc(sizeof(void (**)(const broadcast_msg_t*))*broadcast_total_types);
+void (***broadcast_callbacks)(const broadcast_msg_t* msg);
 
-{<broadcast_callback_assignment>}
+int main(int argc, char** argv) {
+    broadcast_init();
+
+
+    broadcast_callbacks
+        = malloc(sizeof(void (**)(const broadcast_msg_t*)) * broadcast_total_types);
+
+    {<broadcast_callback_assignment>}
 
     //for (int i = 0; i < broadcast_total_types; ++i) {
     //    broadcast_callbacks[i] = malloc(sizeof(void (*)(const broadcast_msg_t*))*broadcast_type_totals[i]);
@@ -19,12 +26,15 @@ int main (int argc, char ** argv) {
     //    //broadcast_callbacks[i][0] = &handler
     //}
 
-{<init>}
+    {<init>}
 
+    static struct timespec tv, tv2;
+    tv.tv_sec  = 1;
+    tv.tv_nsec = 0;
     while (1)
-        usleep(1000);
+        nanosleep(&tv, &tv2);
 
-{<close>}
+    {<close>}
 
     broadcast_close();
 
@@ -33,4 +43,3 @@ int main (int argc, char ** argv) {
     }
     free(broadcast_callbacks);
 }
-
