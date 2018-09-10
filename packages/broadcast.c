@@ -29,7 +29,7 @@ void* broadcast_handler(void* param) {
         if (queue.tail != queue.head) {
             broadcast_msg(queue.buffer[queue.tail]);
             int next = queue.tail + 1;
-            if (next > BROADCAST_QUEUE_SIZE) {
+            if (next == BROADCAST_QUEUE_SIZE) {
                 next = 0;
             }
             queue.tail = next;
@@ -72,7 +72,7 @@ int broadcast_queue_msg(const broadcast_msg_t msg) {
     pthread_mutex_lock(&queue_mut);
     int next;
     next = queue.head + 1;
-    if (next > BROADCAST_QUEUE_SIZE) {
+    if (next == BROADCAST_QUEUE_SIZE) {
         next = 0;
     }
 

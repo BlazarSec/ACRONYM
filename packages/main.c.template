@@ -11,7 +11,7 @@ void (***broadcast_callbacks)(const broadcast_msg_t* msg);
 
 int main(int argc, char** argv) {
     broadcast_callbacks
-        = malloc(sizeof(void (**)(const broadcast_msg_t*)) * broadcast_total_types);
+        = malloc(sizeof(void (***)(const broadcast_msg_t*)) * broadcast_total_types);
 
     broadcast_init();
 
