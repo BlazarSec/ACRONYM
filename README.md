@@ -21,3 +21,6 @@ to be capable of producing functional malware samples from components. ACRONYM a
 means of deploying malware onto inaccessible networks or machines, and is intended for post-exploit
 use, i.e ACRONYM will not get you access to a network, but is useful for creating samples that may
 be deployed onto a network that you have or will gain access to.
+
+
+V1.0 target date August 8
