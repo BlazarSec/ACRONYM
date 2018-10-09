@@ -1,28 +1,22 @@
-Front end structure:
+This doc is to provide information on the code structure of ACRONYM's CLI front end.
 
-The src directory contains the CLI front-end master script, acronym.py,
-along with the modules that acronym.py depends on. Each module is
-structured as a folder where the primary file contains the abstractions
-provided by the module. The utilities that the abstractions depend on are
-sorted into supplementary modules imported by the primary file.
-Supplementary modules including content that may be meant for standalone
-use outside the module are named normally, whereas supplementary modules
-NOT meant for use outside the module are named with a single underscore
-on each side of the module name, ex: "_module.py_" / "_module_"
+All sourcecode for ACRONYM is kept within src/. acronym.py provides the tool itself,
+and depends on the python modules and python packages contained in src/. Because
+ACRONYM has a package management system for sample construction packages, python
+modules and python packages should generally be referred to as pymodules and
+pypackages to avoid confusion.
 
-Abstraction modules are provided as follows:
-    cli - The live interface. A instance of the interface stores the live
-          sample being worked on, the loaded packages available for use,
-          and the commands available to be run.
-    
-    samples - Abstractions for samples being edited in real time. A sample
-              instance may contain one or more components and tracks the
-              relationship between them, so that a sample can be "built,"
-              producing the intial source-code for a real malware sample.
-    
-    templates - Abstractions for translation between loaded packages whose
-                components can be added to live samples and worked with,
-                and templated packages on disk.
+src/cli.py provides a class for the active user session and any helper functions
+thereof. commands are loaded into the user session from whichever package those
+commands pertain to. e.g. commands that handle live samples are defined in samples/.
+The convention for writing runnable commands and loading them into the user session
+is documented in cli.py.
 
-    compile - Provides means of building samples onto disk as live source
-              code.
+src/core/ provides "core" commands that concern the user's active session.
+
+src/sample/ provides abstractions for dealing with live samples, such as building
+and loading, adding/removing/editing components, etc. and the commands for working
+with such actions.
+
+src/template/ provides mechanisms for translating live samples, which exist only as
+python objects in memory, into sourcecode on the disk and vice versa.
