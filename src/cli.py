@@ -1,51 +1,89 @@
 """
-Contains utils for mapping runnable commands into memory and execing commands from text input
+The CLI must be able to load and run commands that operate on packages, samples, etc.
+For this reason, commands are structured as functions indexed by string. When the user
+desires to run a particular command, their command must be parsed into a string
+representing the name of the desired command and a list of arg strings. Loaded commands
+are then indexed with this name to find the desired function, which is then called and
+supplied a reference to the CLI instance and the arg list. These functions also return an
+integer status code, and implement the .help attribute, which is used to provide a short
+snippet of the command's use and purpose.
+
+By convention, supplementary packages to acronym.py which provide commands contain an acmd
+module, which supplies a function load_into(), which is provided a reference to the CLI
+instance. This is not mandated however, as loading any command must be explicitly performed.
+
+Exceptions that are expected by commands should be handled internally or passed up to the
+caller as RuntimeErrors, so that they can be caught by the caller in an except RuntimeError
+block. Since RuntimeError is essentially never used by builtins, we're coopting it here for
+use in place of a CalledCommandError. A FileNotFoundError expected by a commmand, for
+example, should never be passed back to the caller, but could be excepted as fnf
+and raised as RuntimeError(fnf).
+
+The user's session must be able to break out of itself, so the input loop is owned by the
+Instance class. A function is supplied as the loop_func attribute, and called in succession
+while the looping attribute is set.
 """
-
-from inspect import getmembers, isfunction
-from os import listdir
-
-import sample
-import templates
-
 class Instance():
-    # instantiate, loading initial packages
-    def __init__(self, init_local_packages, sample=sample.Sample()):
-        # load initial packages, indexable by string
-        # {"package_name": {"component_name": templates.Component}}
-        packages = {}
+    def __init__(self, loop=None):
+        self.commands = {}
+        self.looping = False
+        self.loop_func = loop
 
-        for package_dir in listdir(init_local_packages):
-            loaded, errors = templates.load_pkgs("{}/{}".format(init_local_packages, package_dir))
+    # bind a function to a name within the instance so that it can be invoked as a command.
+    def load_cmd(self, name, func):
+        if name in self.commands:
+            raise ValueError("'{}' is already defined".format(name))
 
-            if errors:
-                print("[!] One or more errors occurred loading {}:".format(package_dir))
+        self.commands[name] = func
 
-                for e in errors:
-                    print(" * " + e)
+    def start(self):
+        self.looping = True
 
-            packages[package_dir] = loaded
+        while self.looping:
+            self.loop_func()
 
-        self.packages = packages
+    def stop(self):
+        self.looping = False
 
-        # load sample, or else initialize blank sample
-        self.sample = sample
+    # run specified command with args
+    def run(self, cmd, args):
+        return self.commands[cmd](self, args)
 
-        # load commands
-        self.commands = { name: fn for name, fn in _loadcmds_() }
+# accept string and return list of parsed commands ready to be run
+def cstrparse(raw):
+    # determine split points to divide into command strings, ex. user supplies 'foo; bar'
+    splits = [0]
 
-    # attempt to look up function in self.commands and run.
-    # command should be a list of strings from line split by space, like ['example', 'arg']
-    def try_run(self, command):
-        if command[0] in self.commands:
-            self.commands[command[0]](self, command[1:])
-        else:
-            print("[!] {} - no such command\n".format(command[0]))
+    for idx, char in enumerate(raw):
+        if char == ';' and (idx == 0 or raw[idx - 1] != '\\'):
+            splits.append(idx)
 
-# load commands from _commands_.py
-def _loadcmds_():
-    import _commands_
+    splits.append(None)
+    cstrs = [raw[splits[i]:splits[i+1]] for i in range(len(splits) - 1)]
 
-    for member in getmembers(_commands_):
-        if isfunction(member[1]):
-            yield member
+    # parse command strings into tuples of (command, args)
+
+    cmds = []
+    for cstr in cstrs:
+        cstr = cstr.strip(" \n;")
+        in_quote = False
+        words = []
+
+        # blocks of text wrapped in quotes should not be split
+        for word in cstr.split(" "):
+            if '"' in word and "\\\"" not in word:
+                if in_quote:
+                    in_quote = False
+                    words[-1] += " " + word.replace('"', "")
+                else:
+                    in_quote = True
+                    words.append(word.replace('"', ""))
+                continue
+            if in_quote:
+                words[-1] += " " + word
+            else:
+                words.append(word)
+
+        cmds.append((words[0], words[1:]))
+
+    return cmds

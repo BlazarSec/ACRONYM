@@ -1,16 +1,12 @@
 #!/bin/python3
 
-"""
-Main script for CLI frontend
-"""
-
-import sys
 import getopt
+import sys
+
 from os.path import dirname, realpath
 
 import cli
-import sample
-import templates
+import core.acmd
 
 # usage info
 def usage():
@@ -23,58 +19,37 @@ def usage():
         "Options:\n"
         " -h --help :: this\n"
         " -d --dir <dir> :: load initial packages from <dir> instead of acronym/packages/"
+        " -e --exec <command> :: instead of opening shell session, exec command and exit."
     )
 
-# handle options/arguments and initialize CLI
 def main():
+    instance = cli.Instance()
+
+    # load commands from supplementary py packages
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hd:", ["help", "dir="])
+        core.acmd.load_into(instance)
 
-    except getopt.GetoptError as e:
-        print(e, end="\n\n")
-        usage()
-        sys.exit(-1)
+    except ValueError as e:
+        print(f"Error loading core: {e}")
+        return 1
 
-    # default values
-    #TODO try/except block this for folder not found or unreadable
-    init_local_packages = dirname(realpath(__file__))+"/../packages"
+    # feed lines of input into instance
+    def loop():
+        for (cmd, args) in cli.cstrparse(input("# ")): #TODO PS1?
+            if len(cmd):
+                try:
+                    instance.run(cmd, args)
 
-    # handle (option, value) pairs
-    for opt, val in opts:
-        if opt in ["-h", "--help"]:
-            usage()
-            sys.exit(-1)
+                except RuntimeError as e:
+                    print(f"[!] <{cmd}>: {e}")
 
-        if opt in ["-d", "--dir"]:
-            init_local_packages = val
+                except KeyError:
+                    print(f"[!] {cmd} is not a defined command.")
 
-    # instantiate CLI
-     
-    instance = None
+    instance.loop_func = loop
+    instance.start()
 
-    if args:
-        if len(args) != 1:
-            print("wrong number of args: requires 0 or 1, got " + len(args), end="\n\n")
-            usage()
-            sys.exit(-1)
-        
-        try:
-            instance = cli.Instance(init_local_packages, sample=sample.unpickle_from(args[0]))
-            print("[*] Loaded '{}'".format(args[0]))
-
-        except Exception as e:
-            print("[!] An error occurred while attempting to load {}:\n{}", args[0], e)
-            sys.exit(-1)
-    else:
-        instance = cli.Instance(init_local_packages)
-        print("[*] No sample specified - initialized blank sample")
-
-    # read lines from stdin and feed to CLI instance
-    while True:
-        command = input(" > ").strip().split(" ")
-
-        if len(command[0]):
-            instance.try_run(command)
+    return 0
 
 if __name__ == "__main__":
-    main()
+    exit(main())
