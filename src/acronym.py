@@ -33,7 +33,7 @@ def main():
         print(f"Error loading core: {e}")
         return 1
 
-    # feed lines of input into instance
+    # main loop, will feed lines of input into instance
     def loop():
         for (cmd, args) in cli.cstrparse(input("# ")): #TODO PS1?
             if len(cmd):
@@ -46,6 +46,7 @@ def main():
                 except KeyError:
                     print(f"[!] {cmd} is not a defined command.")
 
+    # start loop and hand control off to instance until finished.
     instance.loop_func = loop
     instance.start()
 

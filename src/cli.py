@@ -24,10 +24,12 @@ Instance class. A function is supplied as the loop_func attribute, and called in
 while the looping attribute is set.
 """
 class Instance():
-    def __init__(self, loop=None):
+    def __init__(self, loop=None, sample=None):
         self.commands = {}
         self.looping = False
         self.loop_func = loop
+
+        self.sample = sample
 
     # bind a function to a name within the instance so that it can be invoked as a command.
     def load_cmd(self, name, func):
@@ -47,7 +49,9 @@ class Instance():
 
     # run specified command with args
     def run(self, cmd, args):
-        return self.commands[cmd](self, args)
+        self.commands[cmd](self, args)
+
+
 
 # accept string and return list of parsed commands ready to be run
 def cstrparse(raw):
