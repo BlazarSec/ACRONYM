@@ -3,6 +3,7 @@
 
 import os
 import sys
+import subprocess
 
 
 def scaffold_skeleton(base_path, project_name):
@@ -12,7 +13,7 @@ def scaffold_skeleton(base_path, project_name):
         print("using fullpath {}".format(path))
 
     if not os.path.exists(path):
-        print("creating folder")
+        print("creating folder {}".format(path))
         try:
             os.mkdir(path)
         except OSError:
@@ -27,17 +28,20 @@ def scaffold_skeleton(base_path, project_name):
     cmake_path = os.path.join(path, "CMakeLists.txt")
     bin_path = os.path.join(path, "bin")
     src_path = os.path.join(path, "src")
+    git_path = os.path.join(path, ".git")
     main_path = os.path.join(path, "src", "main.c")
 
     if os.path.exists(gitignore_path):
         print("{} already exists".format(gitignore_path))
     else:
+        print("creating file {}".format(gitignore_path))
         with open(gitignore_path, "w") as f:
             f.write("bin/")
 
     if os.path.exists(cmake_path):
         print("{} already exists".format(cmake_path))
     else:
+        print("creating file {}".format(cmake_path))
         with open(cmake_path, "w") as f:
             f.write("""cmake_minimum_required (VERSION 3.0)
 project ({0})
@@ -84,6 +88,7 @@ target_link_libraries({0} rt Threads::Threads)
     if os.path.exists(bin_path):
         print("{} already exists".format(bin_path))
     else:
+        print("creating folder {}".format(bin_path))
         try:
             os.mkdir(bin_path)
         except OSError:
@@ -93,6 +98,7 @@ target_link_libraries({0} rt Threads::Threads)
     if os.path.exists(src_path):
         print("{} already exists".format(src_path))
     else:
+        print("creating folder {}".format(src_path))
         try:
             os.mkdir(src_path)
         except OSError:
@@ -102,6 +108,7 @@ target_link_libraries({0} rt Threads::Threads)
     if os.path.exists(main_path):
         print("{} already exists".format(main_path))
     else:
+        print("creating file {}".format(main_path))
         with open(main_path, "w") as f:
             f.write("""#include <stdio.h>
 
@@ -110,6 +117,10 @@ int main(void) {
    return 0;
 }
 """)
+    if os.path.exists(git_path):
+        print("{} already exists".format(git_path))
+    else:
+        subprocess.call(['git', 'init', path])
 
 if __name__ == "__main__":
     #if you want to run this directly make sure to run it from the root of the repo
