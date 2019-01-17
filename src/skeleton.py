@@ -85,6 +85,7 @@ def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake
     if folder_init:
         bin_path = os.path.join(path, "bin")
         src_path = os.path.join(path, "src")
+        deps_path = os.path.join(path, "deps")
         if os.path.exists(bin_path):
             wprint("{} already exists".format(bin_path))
         else:
@@ -101,6 +102,16 @@ def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake
             iprint("creating folder {}".format(src_path))
             try:
                 os.mkdir(src_path)
+            except OSError:
+                eprint("failed to create folder")
+                return
+
+        if os.path.exists(deps_path):
+            wprint("{} already exists".format(deps_path))
+        else:
+            iprint("creating folder {}".format(deps_path))
+            try:
+                os.mkdir(deps_path)
             except OSError:
                 eprint("failed to create folder")
                 return

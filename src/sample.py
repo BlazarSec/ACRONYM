@@ -4,6 +4,7 @@ Provides sample abstraction in memory and saving/loading samples to disk.
 
 import pickle
 import skeleton
+import subprocess
 import os
 
 class Sample():
@@ -23,7 +24,18 @@ class Sample():
 
     # just register another path to be included in the cmake
     def add_local_dir(self, path):
-        include_dirs.append(path)
+        self.include_dirs.append(path)
+
+    def add_git_repo(self, url):
+        output = subprocess.getoutput("cd {}; git clone --recursive {}".format(os.path.join(self.path, "deps"), url))
+        lines = output.splitlines()
+        repo = lines[0].split("'")[1]
+        repopath = os.path.join(self.path, "deps", repo)
+
+        print(output)
+
+        self.add_local_dir(repopath)
+
 
     # build C source code at path
     # path is the project root

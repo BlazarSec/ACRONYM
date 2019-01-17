@@ -6,6 +6,7 @@ from logging import iprint, eprint, dprint, wprint
 import skeleton
 import sample
 import os
+import re
 
 base_menu = """1 - create sample
 2 - load sample
@@ -14,9 +15,12 @@ base_menu = """1 - create sample
 loaded_menu= """1 - create sample
 2 - load sample
 3 - build basic skeleton
-4 - save sample
+4 - add git repo
+5 - save sample
 0 - exit
 """
+
+fullyre = re.compile('^(git|ssh|(ftp|http)(s)?).*')
 
 if __name__ == "__main__":
     loaded_sample = None
@@ -56,6 +60,11 @@ if __name__ == "__main__":
                 skeleton.scaffold_skeleton(loaded_sample.path, loaded_sample.name)
                 iprint("skeleton built")
             elif loaded_sample and option == 4:
+                url = input("enter github user/repo or fully qualified url: ")
+                if not fullyre.match(url):
+                    url = "https://github.com/" + url
+                loaded_sample.add_git_repo(url)
+            elif loaded_sample and option == 5:
                 #requires the sample to not be null
                 loaded_sample.pickle()
                 iprint("sample saved")
