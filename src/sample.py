@@ -12,6 +12,8 @@ class Sample():
         #self.modules
         self.include_dirs = []
         self.name = name
+        if os.path.basename(path).lower() != name.lower():
+            path = os.path.join(path, name)
         self.path = path
 
     # pickle self to file
@@ -27,7 +29,11 @@ class Sample():
     # path is the project root
     def build_to(self, path):
         skeleton.build_cmakelists()
-        pass
+
+    # build a string to use to display the currently selected sample
+    # TODO indicate if changes need saving or not
+    def prompt(self):
+        return "[{}]".format(self.name)
 
 # load pickled Sample by path
 def unpickle_from(path):
@@ -36,6 +42,6 @@ def unpickle_from(path):
         t = type(obj)
 
         if t is Sample:
-            return Sample
+            return obj
         else:
             raise TypeError("Expected pickled Sample, found pickled {}".format(t))

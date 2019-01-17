@@ -66,12 +66,9 @@ target_link_libraries({0} rt Threads::Threads)
 
 """.format(project_name, include_str, src_str)
 
-def scaffold_skeleton(base_path, project_name, git_init=True, folder_init=True, cmake=True, helloworld=True):
+def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake=True, helloworld=True):
     #handle people creating a folder for the name of their project before calling the tool
-    path = base_path
-    if os.path.basename(base_path).lower() != project_name.lower():
-        path = os.path.join(base_path, project_name)
-        iprint("using fullpath {}".format(path))
+    iprint("using fullpath {}".format(path))
 
     if not os.path.exists(path):
         iprint("creating folder {}".format(path))
