@@ -1,2 +1,4 @@
 packages/main.c
 packages/sample
+__pycache__/
+src/__pycache__/
