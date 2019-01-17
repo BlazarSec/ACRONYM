@@ -85,40 +85,37 @@ def scaffold_skeleton(base_path, project_name, git_init=True, folder_init=True, 
     else:
         wprint("folder already exists")
 
-    cmake_path = os.path.join(path, "CMakeLists.txt")
-    bin_path = os.path.join(path, "bin")
-    src_path = os.path.join(path, "src")
-    main_path = os.path.join(path, "src", "main.c")
+    if folder_init:
+        bin_path = os.path.join(path, "bin")
+        src_path = os.path.join(path, "src")
+        if os.path.exists(bin_path):
+            wprint("{} already exists".format(bin_path))
+        else:
+            iprint("creating folder {}".format(bin_path))
+            try:
+                os.mkdir(bin_path)
+            except OSError:
+                eprint("failed to create folder")
+                return
 
+        if os.path.exists(src_path):
+            wprint("{} already exists".format(src_path))
+        else:
+            iprint("creating folder {}".format(src_path))
+            try:
+                os.mkdir(src_path)
+            except OSError:
+                eprint("failed to create folder")
+                return
 
-
-    if os.path.exists(bin_path):
-        wprint("{} already exists".format(bin_path))
-    else:
-        iprint("creating folder {}".format(bin_path))
-        try:
-            os.mkdir(bin_path)
-        except OSError:
-            eprint("failed to create folder")
-            return
-
-    if os.path.exists(src_path):
-        wprint("{} already exists".format(src_path))
-    else:
-        iprint("creating folder {}".format(src_path))
-        try:
-            os.mkdir(src_path)
-        except OSError:
-            eprint("failed to create folder")
-            return
-
-    if os.path.exists(main_path):
-        wprint("{} already exists".format(main_path))
-    else:
-        iprint("creating file {}".format(main_path))
-        with open(main_path, "w") as f:
-            f.write("""#include <stdio.h>
-
+    if helloworld:
+        main_path = os.path.join(path, "src", "main.c")
+        if os.path.exists(main_path):
+            wprint("{} already exists".format(main_path))
+        else:
+            iprint("creating file {}".format(main_path))
+            with open(main_path, "w") as f:
+                f.write("""#include <stdio.h>
 int main(void) {
    puts("hello world");
    return 0;
@@ -140,6 +137,7 @@ int main(void) {
             logging.reset_print()
             subprocess.call(['git', 'init', path])
 
+    cmake_path = os.path.join(path, "CMakeLists.txt")
     #call the cmake generator last
     if os.path.exists(cmake_path):
         wprint("{} already exists".format(cmake_path))
