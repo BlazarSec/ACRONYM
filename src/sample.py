@@ -6,6 +6,7 @@ import pickle
 import skeleton
 import subprocess
 import os
+from logging import iprint, eprint, dprint, wprint, nprint
 
 class Sample():
     def __init__(self, name, path):
@@ -16,6 +17,8 @@ class Sample():
         if os.path.basename(path).lower() != name.lower():
             path = os.path.join(path, name)
         self.path = path
+        self.targets = []
+        self.constants = []
 
     # pickle self to file
     def pickle(self):
@@ -32,20 +35,25 @@ class Sample():
         repo = lines[0].split("'")[1]
         repopath = os.path.join(self.path, "deps", repo)
 
-        print(output)
+        nprint(output)
 
         self.add_local_dir(repopath)
 
 
-    # build C source code at path
-    # path is the project root
-    def build_to(self, path):
-        skeleton.build_cmakelists()
+    # pass in all the required args from the sample to the cmakebuilder for further parsing
+    def cmake(self):
+        return skeleton.build_cmakelists(os.path.join(self.path, "src"), self.include_dirs, self.name, self.targets, self.constants)
 
     # build a string to use to display the currently selected sample
     # TODO indicate if changes need saving or not
     def prompt(self):
         return "[{}]".format(self.name)
+
+class RAT(Sample):
+    def __ini__(self, name, path, host):
+        super().__ini__(name, path)
+        self.constants.append(host)
+
 
 # load pickled Sample by path
 def unpickle_from(path):

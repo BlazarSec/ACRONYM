@@ -41,5 +41,10 @@ def eprint(*args, **kwargs):
     print(Fore.RED + "[!] ",file=logging_error_file, end='')
     print(*args, file=logging_error_file, **kwargs)
 
+#normal print to ensure the colors dont carry over
+def nprint(*args, **kwargs):
+    print(Fore.RESET, end='')
+    print(*args)
+
 def reset_print():
     print(Style.RESET_ALL)
