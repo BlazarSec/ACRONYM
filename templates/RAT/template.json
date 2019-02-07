@@ -1,0 +1,8 @@
+{
+    "name":"RAT",
+    "description":"A basic framework for Remote Access Tools (RATs)",
+    "targets": [
+        "server",
+        "client"
+    ]
+}

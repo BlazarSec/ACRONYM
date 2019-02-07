@@ -42,7 +42,17 @@ class Sample():
 
     # pass in all the required args from the sample to the cmakebuilder for further parsing
     def cmake(self):
-        return skeleton.build_cmakelists(os.path.join(self.path, "src"), self.include_dirs, self.name, self.targets, self.constants)
+        cmakestr = skeleton.build_cmakelists(os.path.join(self.path, "src"), self.include_dirs, self.name, self.targets, self.constants)
+        cmake_path = os.path.join(self.path, "CMakeLists.txt")
+        if os.path.exists(cmake_path):
+            wprint("{} already exists".format(cmake_path))
+        else:
+            iprint("creating file {}".format(cmake_path))
+            with open(cmake_path, "w") as f:
+                f.write(cmakestr)
+
+    def scaffold(self):
+        skeleton.scaffold_skeleton(self.path, self.name, cmake=False)
 
     # build a string to use to display the currently selected sample
     # TODO indicate if changes need saving or not
@@ -50,8 +60,8 @@ class Sample():
         return "[{}]".format(self.name)
 
 class RAT(Sample):
-    def __ini__(self, name, path, host):
-        super().__ini__(name, path)
+    def __init__(self, name, path, host):
+        super().__init__(name, path)
         self.constants.append(host)
 
 

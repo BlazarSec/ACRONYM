@@ -77,7 +77,8 @@ if __name__ == "__main__":
                 except FileNotFoundError:
                     eprint("sample not found")
             elif loaded_sample and option == 3:
-                skeleton.scaffold_skeleton(loaded_sample.path, loaded_sample.name, loaded_sample.cmake())
+                loaded_sample.scaffold()
+                loaded_sample.cmake()
                 iprint("skeleton built")
             elif loaded_sample and option == 4:
                 url = input("enter github user/repo or fully qualified url: ")

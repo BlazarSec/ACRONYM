@@ -109,7 +109,7 @@ def build_cmakelists(src_path, include_dirs, project_name, targets=[], constants
 
 
 
-def scaffold_skeleton(path, project_name, cmakelists=None, git_init=True, folder_init=True, cmake=True, helloworld=True):
+def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake=True, helloworld=True):
     #handle people creating a folder for the name of their project before calling the tool
     iprint("using fullpath {}".format(path))
 
@@ -188,16 +188,15 @@ int main(void) {
             logging.reset_print()
             subprocess.call(['git', 'init', path])
 
-    cmake_path = os.path.join(path, "CMakeLists.txt")
     #call the cmake generator last
-    if os.path.exists(cmake_path):
-        wprint("{} already exists".format(cmake_path))
-    else:
-        iprint("creating file {}".format(cmake_path))
-        if not cmakelists:
-            cmakelists = build_cmakelists(src_path, [], project_name)
-        with open(cmake_path, "w") as f:
-            f.write(cmakelists)
+    if cmake:
+        cmake_path = os.path.join(path, "CMakeLists.txt")
+        if os.path.exists(cmake_path):
+            wprint("{} already exists".format(cmake_path))
+        else:
+            iprint("creating file {}".format(cmake_path))
+            with open(cmake_path, "w") as f:
+                f.write(build_cmakelists(src_path, [], project_name))
 
 
 if __name__ == "__main__":
