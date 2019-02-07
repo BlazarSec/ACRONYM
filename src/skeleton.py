@@ -208,3 +208,110 @@ if __name__ == "__main__":
     scaffold_skeleton(sys.argv[1], sys.argv[2])
 
 
+class Cmake():
+    def __init__(self, name):
+        self.name = name
+        self.targets = []
+        self.debug_flags = []
+        self.release_flags = []
+        self.defines = {}
+
+    def add_defines(self, key, value):
+        self.defines[key] = value
+
+    def add_debug_flags(self, flags):
+        for flag in flags:
+            self.debug_flags.append(flag)
+
+    def add_release_flags(self, flags):
+        for flag in flags:
+            self.debug_flags.append(flag)
+
+    def add_target(self, name):
+        self.targets.append(Target(name))
+        return self.targets[-1]
+
+    def __str__(self):
+        return """
+cmake_minimum_required(VERSION 3.2.0)
+project({0})
+
+#default to release
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "" FORCE)
+endif()
+
+#clear defaults
+set(CMAKE_C_FLAGS_DEBUG "")
+set(CMAKE_C_FLAGS_RELEASE "")
+
+#set some standards
+set(CMAKE_C_STANDARD 11)
+add_definitions(-D_POSIX_C_SOURCE=200809L -D_DEFAULT_SOURCE)
+
+#ensure IPO and LTO is avalible
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_LINK_WHAT_YOU_USE ON)
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported OUTPUT error)
+if(ipo_supported)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
+else()
+    message(STATUS "IPO / LTO not supported: <${{error}}>")
+endif()
+""".format(self.name)
+
+
+class Target():
+    def __init__(self, name, strip=True):
+        self.name = name
+        self.strip = strip
+        self.files = []
+        self.libraries= []
+        self.includes = []
+        self.debug_flags = []
+        self.debug_defines = {}
+        self.release_flags = []
+        self.release_defines = {}
+
+    def add_debug_defines(self, key, value):
+        self.debug_defines[key] = value
+
+    def add_release_defines(self, key, value):
+        self.release_defines[key] = value
+
+    def add_debug_flags(self, flags):
+        if isinstance(flags, (list,)):
+            for flag in flags:
+                self.debug_flags.append(flag)
+        else:
+            self.debug_flags.append(flags)
+
+    def add_release_flags(self, flags):
+        if isinstance(flags, (list,)):
+            for flag in flags:
+                self.debug_flags.append(flag)
+        else:
+            self.debug_flags.append(flags)
+
+    def add_library(self, library):
+        self.libraries.append(library)
+
+    def add_file(self, file):
+        self.files.append(file)
+
+    def add_include(self, include):
+        self.includes.append(include)
+
+    def __str__(self):
+        return "\n".join([
+            "set({}_SOURCES\n    {})".join(self.name, '    \n'.join("\"{}\"".format(file) for file in self.files)) if len(self.files) > 0 else "",
+            "set({}_DEBUG {})".format(self.name, ' '.join(debug for debug in self.debug_flags) if len(self.debug_flags) > 0 else ""),
+            "set({}_RELEASE {})".format(self.name, ' '.join(release for release in self.release_flags) if len(self.release_flags) > 0 else ""),
+            "set({}_DEBUG_DEFINES {})".format(self.name, ' '.join("\"-D{}={}\"".format(k,v) for k,v in self.debug_defines.items()) if len(self.debug_defines) > 0 else ""),
+            "set({}_RELEASE_DEFINES {})".format(self.name, ' '.join("\"-D{}={}\"".format(k,v) for k,v in self.release_defines.items()) if len(self.release_defines) > 0 else ""),
+            "target_include_directories({} PUBLIC {})".format(self.name, ' '.join(include for include in self.includes)) if len(self.includes) > 0 else "",
+            "target_link_libraries({} PRIVATE {})".format(self.name, ' '.join(library for library in self.libraries)) if len(self.libraries) > 0 else "",
+            "target_compile_options({0} PRIVATE \"$<$<CONFIG:RELEASE>:${{{0}_RELEASE}}>\" \"$<$<CONFIG:DEBUG>:${{{0}_DEBUG}}>\"".format(self.name),
+            "target_compile_definitions({0} PRIVATE \"$<$<CONFIG:RELEASE>:${{{0}_RELEASE_DEFINES}}>\" \"$<$<CONFIG:DEBUG>:${{{0}_DEBUG_DEFINES}}>\"".format(self.name)
+        ])
