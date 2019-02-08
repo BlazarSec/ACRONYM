@@ -129,6 +129,9 @@ if __name__ == "__main__":
     scaffold_skeleton(sys.argv[1], sys.argv[2])
 
 
+def dr_check(debug, release):
+    return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
+
 class Cmake():
     def __init__(self, name):
         self.name = '_'.join(name.split())
@@ -211,12 +214,13 @@ endif()
 """.format(self.name)]
 
         if len(self.debug_defines) > 0:
-            targetlines.append("set(DEBUG_DEFINES {})".format(' '.join("\"-D{}={}\"".format(k,v) for k,v in self.debug_defines.items())))
+            targetlines.append("set(DEBUG_DEFINES {})".format(' '.join("{}={}".format(k,v) for k,v in self.debug_defines.items())))
 
         if len(self.release_defines) > 0:
             targetlines.append("set(RELEASE_DEFINES {})".format(' '.join("\"-D{}={}\"".format(k,v) for k,v in self.release_defines.items())))
 
-        cmakelines.append("add_definitions(\"$<$<CONFIG:RELEASE>:${RELEASE_DEFINES}>\" \"$<$<CONFIG:DEBUG>:${DEBUG_DEFINES}>\")")
+        cmakelines.append(dr_check("add_definitions(${DEBUG_DEFINES})",
+                                    "add_definitions(${RELEASE_DEFINES})"))
 
         for target in self.targets:
             cmakelines.append("")
@@ -293,8 +297,10 @@ class Target():
         if len(self.libraries) > 0:
             targetlines.append("target_link_libraries({} PRIVATE {})".format(self.name, ' '.join(library for library in self.libraries)))
 
-        targetlines.append("target_compile_options({0} PRIVATE \"$<$<CONFIG:RELEASE>:${{{0}_RELEASE}}>\" \"$<$<CONFIG:DEBUG>:${{{0}_DEBUG}}>\")".format(self.name))
+        targetlines.append(dr_check("target_compile_options({0} PRIVATE ${{{0}_DEBUG}})".format(self.name),
+                                    "target_compile_options({0} PRIVATE ${{{0}_RELEASE}})".format(self.name)))
 
-        targetlines.append("target_compile_definitions({0} PRIVATE \"$<$<CONFIG:RELEASE>:${{{0}_RELEASE_DEFINES}}>\" \"$<$<CONFIG:DEBUG>:${{{0}_DEBUG_DEFINES}}>\")".format(self.name))
+        targetlines.append(dr_check("target_compile_definitions({0} PRIVATE ${{{0}_DEBUG_DEFINES}})".format(self.name),
+                                    "target_compile_definitions({0} PRIVATE ${{{0}_RELEASE_DEFINES}})".format(self.name)))
 
         return "\n".join(targetlines)
