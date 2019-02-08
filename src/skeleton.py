@@ -13,37 +13,6 @@ def contains_end(value, endings):
             return True
     return False
 
-def build_cmakelists(src_path, include_dirs, project_name, targets=[], constants=[], endings=[".c"]):
-    src_files = [f for f in os.listdir(src_path) if os.path.isfile(os.path.join(src_path,f)) and contains_end(f,endings)]
-
-    if len(targets) > 0:
-        #remove the files that are containing the mains for the additional targets
-        for file in src_files:
-            for target in targets:
-                if file.startswith(target):
-                    src_files.remove(file)
-                    #TODO track which file is removed to support more than just c
-                    #also check to make sure its just the name + the ending
-
-    src_str = "    \n".join("\"src/" + f + "\"" for f in src_files)
-
-    include_str = "src"
-
-    if len(include_dirs) > 0:
-        include_str += " " + " ".join(include_dirs)
-
-    targetstr = "\n".join(targettemplate.format(t) for t in targets) if len(targets) > 0 else simpletargettemplate.format(project_name)
-
-    definitionstr = "add_definitions({})".format(" ".join("-D{}".format(s) for s in constants)) if len(constants) > 0 else ""
-
-    return maintemplate.format(project_name,
-                               include_str,
-                               definitionstr,
-                               targetstr,
-                               src_str)
-
-
-
 def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake=True):
     #handle people creating a folder for the name of their project before calling the tool
     iprint("using fullpath {}".format(path))
@@ -118,16 +87,6 @@ def scaffold_skeleton(path, project_name, git_init=True, folder_init=True, cmake
             iprint("creating file {}".format(cmake_path))
             with open(cmake_path, "w") as f:
                 f.write(build_cmakelists(src_path, [], project_name))
-
-
-if __name__ == "__main__":
-    #if you want to run this directly make sure to run it from the root of the repo
-    #./src/skeleton.py /path/for/code
-    if len(sys.argv) != 3:
-        eprint("Please specify a path and a name")
-        sys.exit(1)
-    scaffold_skeleton(sys.argv[1], sys.argv[2])
-
 
 def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)

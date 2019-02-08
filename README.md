@@ -1,4 +1,6 @@
-ACRONYM - A Cool Red-Operative Network Yeeting Multitool
+#ACRONYM
+---
+A Cool Red-Operative Network Yeeting Multitool
 
 ACRONYM is an open-source offensive security tool meant for Red-Team operations whose engagement
 parameters include the deployment of networked malware. The goal of ACRONYM is to enable efficient
@@ -24,3 +26,6 @@ be deployed onto a network that you have or will gain access to.
 
 
 V1.0 target date August 8
+
+# Usage
+As always this is for legal educational use only
