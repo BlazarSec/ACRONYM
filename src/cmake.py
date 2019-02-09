@@ -144,11 +144,11 @@ class Target():
     def __str__(self):
         targetlines = ["#{} specific configuration".format(self.name)]
 
-        if self.files:
+        if not self.files:
             targetlines.append("#no files in target, skipped")
             return "\n".join(targetlines)
 
-        targetlines.append("set({}_SOURCES\n    {})".format(self.name, '    \n'.join("\"{}\"".format(file) for file in self.files)))
+        targetlines.append("set({}_SOURCES\n    {})".format(self.name, '\n    '.join("\"{}\"".format(file) for file in self.files)))
 
         targetlines.append("add_executable({0} ${{{0}_SOURCES}})".format(self.name))
 
