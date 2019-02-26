@@ -2,6 +2,7 @@
 
 import argparse
 from acronym.sample import *
+from acronym.cmake import *
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ACRONYM")
@@ -13,6 +14,8 @@ if __name__ == "__main__":
 
     if args.mode == "gen":
         sam = Sample(args.name, args.path)
+        #TODO find a way to deal with folder paths better
+        sam.cmake.targets.append(Target(args.name, files=["src/main.c"]))
         sam.gen_scaffold()
         sam.gen_cmake()
         sam.pickle()

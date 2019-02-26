@@ -47,10 +47,14 @@ def scaffold(path, project_name, c3po=True):
 
 
     if c3po:
+        iprint("initializing blank c3po copies")
         c3po_path = os.path.join(path, "c3po")
         dirmake(c3po_path)
         gen_path = os.path.join(path, "gen")
         dirmake(gen_path)
+        for file in [os.path.join(gen_path, file) for file in os.listdir(src_path) if os.path.isfile(os.path.join(src_path, file)) and (file.endswith(".c") or file.endswith(".h"))]:
+            #create them blank
+            open(file, 'a').close()
 
     gitignore_path = os.path.join(path, ".gitignore")
     git_path = os.path.join(path, ".git")

@@ -2,8 +2,9 @@ def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
 class Cmake():
-    def __init__(self, name, targets=[], debug_flags=[], release_flags=[], debug_defines={}, release_defines={}):
+    def __init__(self, name, c3po=True, targets=[], debug_flags=[], release_flags=[], debug_defines={}, release_defines={}):
         self.name = '_'.join(name.split())
+        self.c3po = c3po
         self.targets = targets
         self.debug_flags = debug_flags
         self.release_flags = release_flags
@@ -11,12 +12,14 @@ class Cmake():
         self.release_defines = release_defines
 
     def add_target(self, name):
-        self.targets.append(Target(name))
+        self.targets.append(Target(name, c3po=self.c3po))
         return self.targets[-1]
+
     def __str__(self):
-        return '({}[{}]<dflags{}><rflags{}><ddefs{}><rdefs{}>)'.format(
+        return '({}[{}]<c3po{}><dflags{}><rflags{}><ddefs{}><rdefs{}>)'.format(
             self.name,
             self.targets,
+            self.c3po,
             self.debug_flags,
             self.release_flags,
             self.debug_defines,

@@ -10,14 +10,15 @@ from .cmake import Cmake
 from .skeleton import scaffold
 
 class Sample():
-    def __init__(self, name, path):
+    def __init__(self, name, path, c3po=True):
         self.name = name
+        self.c3po = c3po
 
         #normalize path to not duplicate such as ./name/name
         if os.path.basename(path).lower() != name.lower():
             path = os.path.join(path, name)
         self.path = path
-        self.cmake = Cmake(name)
+        self.cmake = Cmake(name, c3po=self.c3po)
 
     # pickle self to file
     def pickle(self):
@@ -36,7 +37,7 @@ class Sample():
 
     #build the directory structure
     def gen_scaffold(self):
-        scaffold(self.path, self.name)
+        scaffold(self.path, self.name, c3po=self.c3po)
 
     # build a string to use to display the currently selected sample
     # TODO indicate if changes need saving or not
