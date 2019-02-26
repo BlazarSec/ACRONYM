@@ -4,8 +4,7 @@
 import os
 import sys
 import subprocess
-import logging
-from logging import iprint, eprint, dprint, wprint
+from .logging import iprint, eprint, dprint, wprint, reset_print
 
 def contains_end(value, endings):
     for end in endings:
@@ -50,6 +49,8 @@ def scaffold(path, project_name, c3po=True):
     if c3po:
         c3po_path = os.path.join(path, "c3po")
         dirmake(c3po_path)
+        gen_path = os.path.join(path, "gen")
+        dirmake(gen_path)
 
     gitignore_path = os.path.join(path, ".gitignore")
     git_path = os.path.join(path, ".git")
@@ -62,5 +63,5 @@ def scaffold(path, project_name, c3po=True):
     if os.path.exists(git_path):
         wprint("{} already exists".format(git_path))
     else:
-        logging.reset_print()
+        reset_print()
         subprocess.call(['git', 'init', path])

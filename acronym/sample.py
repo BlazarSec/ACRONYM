@@ -5,9 +5,9 @@ Provides sample abstraction in memory and saving/loading samples to disk.
 import pickle
 import subprocess
 import os
-from logging import iprint, eprint, dprint, wprint, nprint
-from cmake import Cmake
-from skeleton import scaffold
+from .logging import iprint, eprint, dprint, wprint, nprint
+from .cmake import Cmake
+from .skeleton import scaffold
 
 class Sample():
     def __init__(self, name, path):
@@ -32,7 +32,7 @@ class Sample():
         else:
             iprint("creating file {}".format(cmake_path))
         with open(cmake_path, "w") as f:
-            f.write(str(self.cmake))
+            f.write(self.cmake.compile())
 
     #build the directory structure
     def gen_scaffold(self):

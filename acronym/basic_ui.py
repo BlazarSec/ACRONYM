@@ -40,6 +40,7 @@ target_config_menu = """1 - add debug defines
 5 - add file
 6 - add include
 7 - add library
+8 - toggle C-3PO
 0 - exit
 """
 
@@ -165,6 +166,8 @@ if __name__ == "__main__":
                                 elif opt == 7:
                                     lib = input("enter library: ")
                                     loaded_sample.cmake.targets[index].add_library(lib)
+                                elif opt == 7:
+                                    loaded_sample.cmake.targets[index].toggle_c3po()
                         else:
                             eprint("index out of range")
 
