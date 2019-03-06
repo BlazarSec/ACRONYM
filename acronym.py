@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("path", help="path to the project")
     parser.add_argument("mode", help="what operation to perform", choices=["gen","status"])
     parser.add_argument("--scan", help="when rebuilding, scan the specified folder for sources, defaults to 'src/'", nargs='?', const='src/', default='src/')
-    parser.add_argument("--c3po", help="enable c3po additional build steps", default=False)
+    parser.add_argument("--c3po", help="enable c3po additional build steps", action='store_true')
 
     args = parser.parse_args()
 
