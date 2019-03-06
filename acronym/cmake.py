@@ -2,7 +2,10 @@ def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
 class Cmake():
-    def __init__(self, name, c3po=True, targets=[], debug_flags=[], release_flags=[], debug_defines={}, release_defines={}):
+    def __init__(self, name, c3po=True, targets=[],
+                 debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
+                 release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
+                 debug_defines={}, release_defines={}):
         self.name = '_'.join(name.split())
         self.c3po = c3po
         self.targets = targets
@@ -38,8 +41,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #clear defaults
-set(CMAKE_C_FLAGS_DEBUG "")
-set(CMAKE_C_FLAGS_RELEASE "")
+set(CMAKE_C_FLAGS_DEBUG "{1}")
+set(CMAKE_C_FLAGS_RELEASE "{2}")
 
 #set some standards
 set(CMAKE_C_STANDARD 11)
@@ -71,7 +74,7 @@ if(GIT_FOUND AND EXISTS "${{PROJECT_SOURCE_DIR}}/.git")
         endif()
     endif()
 endif()
-""".format(self.name)]
+""".format(self.name, ' '.join(flag for flag in self.debug_flags), ' '.join(flag for flag in self.release_flags))]
 
         if self.debug_defines:
             targetlines.append("set(DEBUG_DEFINES {})".format(' '.join("{}={}".format(k,v) for k,v in self.debug_defines.items())))
@@ -91,9 +94,7 @@ endif()
 
 
 class Target():
-    def __init__(self, name, strip=True, c3po=True, files=[], libraries=[], includes=[],
-                 debug_flags="-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split(), debug_defines={},
-                 release_flags="-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split(), release_defines={}):
+    def __init__(self, name, strip=True, c3po=True, files=[], libraries=[], includes=[], debug_flags=[], debug_defines={}, release_flags=[], release_defines={}):
         self.name = '_'.join(name.split())
         self.strip = strip
         self.c3po = c3po

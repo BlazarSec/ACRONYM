@@ -26,5 +26,8 @@ if __name__ == "__main__":
         sam.gen_cmake()
         sam.pickle()
     else:
-        sam = unpickle_from(os.path.join(args.path, ".sample.pickle"))
+        path = args.path
+        if os.path.basename(path).lower() != args.name.lower():
+            path = os.path.join(path, args.name)
+        sam = unpickle_from(os.path.join(path, ".sample.pickle"))
         print(str(sam.cmake))
