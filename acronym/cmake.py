@@ -11,8 +11,8 @@ class Cmake():
         self.debug_defines = debug_defines
         self.release_defines = release_defines
 
-    def add_target(self, name):
-        self.targets.append(Target(name, c3po=self.c3po))
+    def add_target(self, name, **kwargs):
+        self.targets.append(Target(name, c3po=self.c3po, **kwargs))
         return self.targets[-1]
 
     def __str__(self):
