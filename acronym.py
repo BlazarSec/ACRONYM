@@ -9,13 +9,14 @@ if __name__ == "__main__":
     parser.add_argument("name", help="the name of the project to generate")
     parser.add_argument("path", help="path to the project")
     parser.add_argument("mode", help="what operation to perform", choices=["gen","status"])
-    parser.add_argument("--scan", help="when rebuilding, scan the specified folder for sources, defaults to 'src/'", nargs='?', const='src/', default='src/')
+    parser.add_argument("--scan", help="when rebuilding, scan the specified folder for sources, defaults to 'src/'", nargs='?', const='src/')
     parser.add_argument("--c3po", help="enable c3po additional build steps", action='store_true')
+    parser.add_argument("--strip", help="enable strip additional build step", action='store_true')
 
     args = parser.parse_args()
 
     if args.mode == "gen":
-        sam = Sample(args.name, args.path, c3po=args.c3po)
+        sam = Sample(args.name, args.path, c3po=args.c3po, strip=args.strip)
         if args.scan:
             scan_path = os.path.join(sam.path, args.scan)
             paths = [os.path.join(args.scan, file) for file in os.listdir(scan_path) if os.path.isfile(os.path.join(scan_path, file)) and file.endswith(".c")]

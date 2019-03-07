@@ -2,12 +2,13 @@ def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
 class Cmake():
-    def __init__(self, name, c3po=True, targets=[],
+    def __init__(self, name, c3po=True, strip=True, targets=[],
                  debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
                  release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
                  debug_defines={}, release_defines={}):
         self.name = '_'.join(name.split())
         self.c3po = c3po
+        self.strip = strip
         self.targets = targets
         self.debug_flags = debug_flags
         self.release_flags = release_flags
@@ -15,7 +16,7 @@ class Cmake():
         self.release_defines = release_defines
 
     def add_target(self, name, **kwargs):
-        self.targets.append(Target(name, c3po=self.c3po, **kwargs))
+        self.targets.append(Target(name, c3po=self.c3po, strip=self.strip, **kwargs))
         return self.targets[-1]
 
     def __str__(self):
@@ -25,6 +26,7 @@ targets: [
     {}
 ]
 c3po: {}
+strip: {}
 dflags: {}
 rflags: {}
 ddefs: {}
@@ -33,6 +35,7 @@ rdefs: {}
     self.name,
     ',\n'.join("\n    ".join(str(t).split('\n')) for t in self.targets),
     self.c3po,
+    self.strip,
     self.debug_flags,
     self.release_flags,
     self.debug_defines,

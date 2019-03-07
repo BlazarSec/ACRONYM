@@ -10,15 +10,17 @@ from .cmake import Cmake
 from .skeleton import scaffold
 
 class Sample():
-    def __init__(self, name, path, c3po=True):
+    def __init__(self, name, path, c3po=True, strip=True):
         self.name = name
         self.c3po = c3po
+        self.strip = strip
 
         #normalize path to not duplicate such as ./name/name
         if os.path.basename(path).lower() != name.lower():
             path = os.path.join(path, name)
         self.path = path
-        self.cmake = Cmake(name, c3po=self.c3po)
+        #pass any unconsumed args through to cmake
+        self.cmake = Cmake(name, c3po=self.c3po, strip=self.strip)
 
     # pickle self to file
     def pickle(self):
