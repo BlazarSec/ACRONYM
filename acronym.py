@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("--scan", help="when rebuilding, scan the specified folder for sources, defaults to 'src/'", nargs='?', const='src/')
     parser.add_argument("--c3po", help="enable c3po additional build steps", action='store_true')
     parser.add_argument("--strip", help="enable strip additional build step", action='store_true')
+    parser.add_argument("--link", help="add additional linking options comma seperated, defaults to 'rt,pthreads'", nargs='?', const='rt,pthread')
 
     args = parser.parse_args()
 
@@ -20,9 +21,9 @@ if __name__ == "__main__":
         if args.scan:
             scan_path = os.path.join(sam.path, args.scan)
             paths = [os.path.join(args.scan, file) for file in os.listdir(scan_path) if os.path.isfile(os.path.join(scan_path, file)) and file.endswith(".c")]
-            sam.cmake.add_target(args.name, files=paths)
+            sam.cmake.add_target(args.name, files=paths, libraries=args.link.split(',') if args.link else [])
         else:
-            sam.cmake.targets.append(Target(args.name))
+            sam.cmake.add_target(args.name)
         sam.gen_scaffold()
         sam.gen_cmake()
         sam.pickle()
