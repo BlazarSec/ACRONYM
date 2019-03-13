@@ -23,13 +23,12 @@ if __name__ == "__main__":
         #target mode
         if args.target:
             print(f"target {args.target}")
-            print(f"target {args.target}")
             if args.mode == "stat":
                 pass
             elif args.mode == "add":
-                pass
+                print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
-                pass
+                print(f"setting {args.set} {args.state}")
 
         #global mode
         else:
@@ -37,9 +36,9 @@ if __name__ == "__main__":
             if args.mode == "stat":
                 pass
             elif args.mode == "add":
-                pass
+                print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
-                pass
+                print(f"setting {args.set} to {args.state}")
 
 '''
     parser = argparse.ArgumentParser(description="ACRONYM")

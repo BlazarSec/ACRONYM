@@ -63,15 +63,31 @@ class Args:
                 self.mode = "help"
                 return
             self.mode = "set"
-            #TODO implement set options
+            if argv[1] not in ['c', 'c3po', 's', 'strip']:
+                self.mode = "help"
+                return
+            self.set = 'c3po' if argv[1] in 'c3po' else 'strip'
+            if argv[2] not in ['on', 'off']:
+                self.mode = "help"
+                return
+            self.state = (argv[2] == 'on')
         # ./ add debug flag -g
         elif argv[0] in ['a', 'add']:
             if len(argv) != 4:
                 self.mode = "help"
                 return
             self.mode = "add"
-            #TODO implement add options
+            if argv[1] not in ['d', 'debug', 'r', 'release']:
+                self.mode = "help"
+                return
+            self.add = 'debug' if argv[1] in 'debug' else 'release'
+            if argv[2] not in ['f', 'flag', 'd', 'define']:
+                self.mode = "help"
+                return
+            self.type = 'flag' if argv[2] in 'flag' else 'define'
+            self.option = argv[3]
         else:
+            #handle target based configs
             if len(argv) == 1:
                 self.mode = "help"
                 return
@@ -83,9 +99,32 @@ class Args:
                 return
 
             if argv[1] in ['s', 'set']:
+                if len(argv) != 4:
+                    self.mode = "help"
+                    return
                 self.mode = "set"
+                if argv[2] not in ['c3po', 'strip']:
+                    self.mode = "help"
+                    return
+                self.set = 'c3po' if argv[2] in ['c', 'c3po'] else 'strip'
+                if argv[3] not in ['on', 'off']:
+                    self.mode = "help"
+                    return
+                self.state = (argv[3] == 'on')
             elif argv[1] in ['a', 'add']:
+                if len(argv) != 5:
+                    self.mode = "help"
+                    return
                 self.mode = "add"
+                if argv[2] not in ['d', 'debug', 'r', 'release']:
+                    self.mode = "help"
+                    return
+                self.add = 'debug' if argv[2] in 'debug' else 'release'
+                if argv[3] not in ['f', 'flag', 'd', 'define']:
+                    self.mode = "help"
+                    return
+                self.type = 'flag' if argv[3] in 'flag' else 'define'
+                self.option = argv[4]
             else:
                 self.mode = "help"
 
