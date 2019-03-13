@@ -2,7 +2,7 @@ def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
 class Cmake():
-    def __init__(self, name, c3po=True, strip=True, targets=[],
+    def __init__(self, name, c3po=True, strip=True, targets={},
                  debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
                  release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
                  debug_defines={}, release_defines={}):
@@ -16,8 +16,8 @@ class Cmake():
         self.release_defines = release_defines
 
     def add_target(self, name, **kwargs):
-        self.targets.append(Target(name, c3po=self.c3po, strip=self.strip, **kwargs))
-        return self.targets[-1]
+        self.targets[name] = Target(name, c3po=self.c3po, strip=self.strip, **kwargs)
+        return self.targets[name]
 
     def __str__(self):
         return '''(

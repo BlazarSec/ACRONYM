@@ -15,6 +15,8 @@ interface:
         {s}et {c3po, strip} {on, off}
         {a}dd {debug, release} {flag, define} <option>
         {a}dd <target>
+        <target>
+            -prints stats and target specific setup
         <target> {a}dd {f}ile <path>
         <target> {a}dd {l}ibrary <name>
         <target> {a}dd {i}nclude <path>
@@ -90,12 +92,12 @@ class Args:
             self.option = argv[3]
         else:
             #handle target based configs
-            if len(argv) == 1:
-                self.mode = "help"
-                return
+
             #check if arg.target
             self.target = argv[0]
-            if len(argv) == 2:
+
+            #just a target path
+            if len(argv) == 1:
                 #target stat mode
                 self.mode = "stat"
                 return

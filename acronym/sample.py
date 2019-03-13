@@ -10,20 +10,38 @@ from .cmake import Cmake
 from .skeleton import scaffold
 
 class Sample():
+    # load pickled Sample by path
+    def unpickle_from(path, name=""):
+        actual_path = Sample.pickle_path(Sample.sample_path(path, name))
+        if os.path.exists(actual_path):
+            with open(actual_path, "rb") as f:
+                obj = pickle.load(f)
+                t = type(obj)
+                if t is Sample:
+                    return obj
+                else:
+                    raise TypeError(f"Expected pickled Sample, found pickled {t}")
+
+    #normalize path to not duplicate such as ./name/name
+    def sample_path(path, name):
+        if os.path.basename(path).lower() != name.lower():
+            path = os.path.join(path, name)
+        return path
+
+    def pickle_path(path):
+        return os.path.join(path, ".sample.pickle")
+
     def __init__(self, name, path, c3po=True, **kwargs):
         self.name = name
         self.c3po = c3po
 
-        #normalize path to not duplicate such as ./name/name
-        if os.path.basename(path).lower() != name.lower():
-            path = os.path.join(path, name)
-        self.path = path
+        self.path = Sample.sample_path(path, name)
         #pass any unconsumed args through to cmake
         self.cmake = Cmake(name, c3po=self.c3po, **kwargs)
 
     # pickle self to file
     def pickle(self):
-        with open(os.path.join(self.path, ".sample.pickle"), "wb") as f:
+        with open(Sample.pickle_path(self.path), "wb") as f:
             pickle.dump(self, f)
 
     #(re)generate the cmake file
@@ -45,13 +63,3 @@ class Sample():
     def prompt(self):
         return "[{}]".format(self.name)
 
-# load pickled Sample by path
-def unpickle_from(path):
-    with open(path, "rb") as f:
-        obj = pickle.load(f)
-        t = type(obj)
-
-        if t is Sample:
-            return obj
-        else:
-            raise TypeError("Expected pickled Sample, found pickled {}".format(t))

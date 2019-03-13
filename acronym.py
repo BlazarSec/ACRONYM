@@ -5,6 +5,7 @@ from acronym.sample import *
 from acronym.cmake import *
 from acronym.args import *
 
+#TODO switch prints to use the exisitng logging interface
 if __name__ == "__main__":
     args = Args(sys.argv)
     print(f"==>{args.mode}<==")
@@ -17,14 +18,29 @@ if __name__ == "__main__":
     elif args.mode == "help":
         args_help()
     elif args.mode == "init":
-        print(f"generating {args.name} in '{args.path}'")
+        print(f"generating in {args.name}")
+        sam = Sample.unpickle_from(args.name, args.path)
+        if sam:
+            print("found exising sample, regenerating")
+        else:
+            sam = Sample(args.path, args.name)
+        sam.gen_scaffold()
+        sam.gen_cmake()
+        sam.pickle()
     else:
         print(f"loading '{args.path}'")
+        sam = Sample.unpickle_from(args.path)
+        if not sam:
+            print("unable to load sample")
+            sys.exit(1)
         #target mode
         if args.target:
             print(f"target {args.target}")
             if args.mode == "stat":
-                pass
+                if args.target in sam.cmake.targets:
+                    print(str(sam.cmake.targets[args.target]))
+                else:
+                    print("target not found in cmake")
             elif args.mode == "add":
                 print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
@@ -34,7 +50,7 @@ if __name__ == "__main__":
         else:
             print("global")
             if args.mode == "stat":
-                pass
+                print(str(sam.cmake))
             elif args.mode == "add":
                 print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
