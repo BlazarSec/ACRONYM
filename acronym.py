@@ -17,7 +17,7 @@ if __name__ == "__main__":
     elif args.mode == "help":
         args_help()
     elif args.mode == "init":
-        pass
+        print(f"generating {args.name} in '{args.path}'")
     else:
         print(f"loading '{args.path}'")
         #target mode

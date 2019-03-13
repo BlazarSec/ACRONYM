@@ -37,6 +37,14 @@ class Args:
         elif argv[1] in ['t', 'test']:
             self.mode = "test"
             return
+        elif argv[1] in ['i','init']:
+            if len(argv) == 4:
+                self.mode = "init"
+                self.name = argv[2]
+                self.path = argv[3]
+            else:
+                self.mode = "help"
+            return
 
         # if there was a path consume it
         if os.path.exists(argv[1]):
@@ -51,14 +59,8 @@ class Args:
             self.mode = "stat"
             return
 
-        if argv[0] in ['i','init']:
-            if len(argv) == 2:
-                self.mode = "init"
-                self.name = argv[1]
-            else:
-                self.mode = "help"
         # set c3po on
-        elif argv[0] in ['s', 'set']:
+        if argv[0] in ['s', 'set']:
             if len(argv) != 3:
                 self.mode = "help"
                 return
