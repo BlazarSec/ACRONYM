@@ -1,10 +1,21 @@
 #!/usr/bin/env python3
 
-import argparse
+import sys
 from acronym.sample import *
 from acronym.cmake import *
+from acronym.args import *
 
 if __name__ == "__main__":
+    args = Args(sys.argv)
+    print(args.mode)
+    if args.mode == "test":
+        suite = unittest.TestSuite()
+        results = unittest.TestResult()
+        suite.addTest(unittest.makeSuite(ArgsTest))
+        runner = unittest.TextTestRunner()
+        print(runner.run(suite))
+
+'''
     parser = argparse.ArgumentParser(description="ACRONYM")
     parser.add_argument("name", help="the name of the project to generate")
     parser.add_argument("path", help="path to the project")
@@ -33,3 +44,4 @@ if __name__ == "__main__":
             path = os.path.join(path, args.name)
         sam = unpickle_from(os.path.join(path, ".sample.pickle"))
         print(str(sam.cmake))
+        '''
