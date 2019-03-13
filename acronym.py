@@ -7,13 +7,39 @@ from acronym.args import *
 
 if __name__ == "__main__":
     args = Args(sys.argv)
-    print(args.mode)
+    print(f"==>{args.mode}<==")
     if args.mode == "test":
         suite = unittest.TestSuite()
         results = unittest.TestResult()
         suite.addTest(unittest.makeSuite(ArgsTest))
         runner = unittest.TextTestRunner()
         print(runner.run(suite))
+    elif args.mode == "help":
+        args_help()
+    elif args.mode == "init":
+        pass
+    else:
+        print(f"loading '{args.path}'")
+        #target mode
+        if args.target:
+            print(f"target {args.target}")
+            print(f"target {args.target}")
+            if args.mode == "stat":
+                pass
+            elif args.mode == "add":
+                pass
+            elif args.mode == "set":
+                pass
+
+        #global mode
+        else:
+            print("global")
+            if args.mode == "stat":
+                pass
+            elif args.mode == "add":
+                pass
+            elif args.mode == "set":
+                pass
 
 '''
     parser = argparse.ArgumentParser(description="ACRONYM")

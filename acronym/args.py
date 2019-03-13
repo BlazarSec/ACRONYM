@@ -2,8 +2,8 @@ import unittest
 import os
 
 #TODO add removing settings
-'''
-symbol meaning:
+def args_help():
+    print('''symbol meaning:
     <filled by user>
     {list,of,possible,options}
     {m}inimum required option ie 'm' or 'minimum'
@@ -21,10 +21,11 @@ interface:
         <target> {a}dd {debug, release} {flag, define} <option>
         <target> {s}et {c3po, strip} {on, off}
     <path> {i}nit <name>
-'''
+''')
 
 class Args:
     def __init__(self, argv=[]):
+        self.target = None
         # no args
         if len(argv) == 1:
             self.mode = "help"
