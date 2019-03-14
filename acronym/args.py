@@ -23,7 +23,7 @@ interface:
         <target> {a}dd {i}nclude <paths ...>
         <target> {a}dd {debug, release} {flag, define} <options ...>
         <target> {s}et {c3po, strip} {on, off}
-    <path> {i}nit <name>
+    {i}nit <name> <path>
 ''')
 
 class Args:
@@ -34,6 +34,7 @@ class Args:
             self.mode = "help"
             return
 
+        #commands that prempt paths
         if argv[1] in ['h', 'help']:
             self.mode = "help"
             return
@@ -57,12 +58,13 @@ class Args:
             argv = argv[1:]
             self.path = "./"
 
-        # no args or stat requested
+
+        # no args
         if not argv:
             self.mode = "stat"
             return
 
-        # set c3po on
+        # global set
         if argv[0] in ['s', 'set']:
             if len(argv) != 3:
                 self.mode = "help"
@@ -76,62 +78,75 @@ class Args:
                 self.mode = "help"
                 return
             self.state = (argv[2] == 'on')
-        # ./ add debug flag -g
+        # global add
         elif argv[0] in ['a', 'add']:
             if len(argv) < 4:
                 self.mode = "help"
                 return
             self.mode = "add"
-            if argv[1] not in ['d', 'debug', 'r', 'release']:
+
+            if argv[1] in ['d', 'debug', 'r', 'release'] and argv[2] in ['f', 'flag', 'd', 'define']:
+                self.add = 'debug' if argv[1] in 'debug' else 'release'
+                self.type = 'flag' if argv[2] in 'flag' else 'define'
+                self.option = argv[3:]
+            else:
                 self.mode = "help"
                 return
-            self.add = 'debug' if argv[1] in 'debug' else 'release'
-            if argv[2] not in ['f', 'flag', 'd', 'define']:
-                self.mode = "help"
-                return
-            self.type = 'flag' if argv[2] in 'flag' else 'define'
-            #collect all additional flags
-            self.option = argv[3:]
         else:
             #handle target based configs
 
             #check if arg.target
             self.target = argv[0]
 
-            #just a target path
+            #target no args
             if len(argv) == 1:
                 #target stat mode
                 self.mode = "stat"
                 return
 
+            # target set
             if argv[1] in ['s', 'set']:
                 if len(argv) != 4:
                     self.mode = "help"
                     return
                 self.mode = "set"
+
                 if argv[2] not in ['c3po', 'strip']:
                     self.mode = "help"
                     return
                 self.set = 'c3po' if argv[2] in ['c', 'c3po'] else 'strip'
+
                 if argv[3] not in ['on', 'off']:
                     self.mode = "help"
                     return
                 self.state = (argv[3] == 'on')
+
+            # target add
             elif argv[1] in ['a', 'add']:
-                if len(argv) < 5:
+                if len(argv) < 4:
                     self.mode = "help"
                     return
                 self.mode = "add"
-                if argv[2] not in ['d', 'debug', 'r', 'release']:
+
+                if argv[2] in ['d', 'debug', 'r', 'release'] and argv[3] in ['f', 'flag', 'd', 'define']:
+                    self.add = 'debug' if argv[2] in 'debug' else 'release'
+                    self.type = 'flag' if argv[3] in 'flag' else 'define'
+                    self.option = argv[4:]
+                    return
+
+                elif argv[2] in ['f', 'file']:
+                    self.add = 'file'
+                elif argv[2] in ['l', 'library']:
+                    self.add = 'library'
+                elif argv[2] in ['i', 'include']:
+                    self.add = 'include'
+
+                else:
                     self.mode = "help"
                     return
-                self.add = 'debug' if argv[2] in 'debug' else 'release'
-                if argv[3] not in ['f', 'flag', 'd', 'define']:
-                    self.mode = "help"
-                    return
-                self.type = 'flag' if argv[3] in 'flag' else 'define'
-                #collect all additional flags
-                self.option = argv[4:]
+                #files libs and includes all collect multiple args
+                self.option = argv[3:]
+
             else:
                 self.mode = "help"
 

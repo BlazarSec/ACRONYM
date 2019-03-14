@@ -31,7 +31,7 @@ class Sample():
     def pickle_path(path):
         return os.path.join(path, ".sample.pickle")
 
-    def __init__(self, name, path, c3po=True, **kwargs):
+    def __init__(self, path, name, c3po=True, **kwargs):
         self.name = name
         self.c3po = c3po
 

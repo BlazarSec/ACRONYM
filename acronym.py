@@ -21,11 +21,11 @@ if __name__ == "__main__":
         sys.exit(0)
     elif args.mode == "init":
         print(f"generating in {args.name}")
-        sam = Sample.unpickle_from(args.name, args.path)
+        sam = Sample.unpickle_from(args.path, args.name)
         if sam:
             print("found exising sample, regenerating")
         else:
-            sam = Sample(args.path, args.name)
+            sam = Sample(path=args.path, name=args.name)
         sam.gen_scaffold()
     else:
         print(f"loading '{args.path}'")
@@ -35,20 +35,23 @@ if __name__ == "__main__":
             sys.exit(1)
         #target mode
         if args.target:
-            print(f"==>{args.target}<==")
+            print(f"==>target: {args.target}<==")
             if args.mode == "stat":
                 if args.target not in sam.cmake.targets:
                     print(f"creating new target {args.target}")
                     sam.cmake.add_target(args.target)
                 print(str(sam.cmake.targets[args.target]))
             elif args.mode == "add":
-                print(f"adding {args.add} {args.type} {args.option}")
+                if args.add in ['debug', 'release']:
+                    print(f"adding {args.add} {args.type} {args.option}")
+                else:
+                    print(f"adding {args.add} {args.option}")
             elif args.mode == "set":
                 print(f"setting {args.set} {args.state}")
 
         #global mode
         else:
-            print("global")
+            print("==>global<==")
             if args.mode == "stat":
                 print(str(sam.cmake))
             elif args.mode == "add":
@@ -57,7 +60,9 @@ if __name__ == "__main__":
                 print(f"setting {args.set} to {args.state}")
 
     if sam:
-        sam.gen_cmake()
+        if args.mode not in ['help', 'stat']:
+            sam.gen_cmake()
+        #save changes
         sam.pickle()
 
 '''
