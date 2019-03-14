@@ -33,7 +33,7 @@ ddefs: {}
 rdefs: {}
 )'''.format(
     self.name,
-    ',\n'.join("\n    ".join(str(t).split('\n')) for t in self.targets),
+    ',\n'.join("\n    ".join(str(self.targets[t]).split('\n')) for t in self.targets),
     self.c3po,
     self.strip,
     self.debug_flags,
