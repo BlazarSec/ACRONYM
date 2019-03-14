@@ -203,3 +203,15 @@ class ArgsTest(unittest.TestCase):
 
         a = Args(["test.py", "set"])
         self.assertEquals(a.mode, "help")
+
+    def test_file(self):
+        a = Args(["~/test", "main", "add", "file", "src/test.c"])
+        self.assertEquals(a.mode, "add")
+        self.assertEquals(a.add, "file")
+        self.assertEquals(a.option, ["src/test.c"])
+
+        a = Args(["~/test", "main", "add", "file", "src/test.c", "src/main.c"])
+        self.assertEquals(a.mode, "add")
+        self.assertEquals(a.add, "file")
+        self.assertEquals(a.option, ["src/test.c", "src/main.c"])
+

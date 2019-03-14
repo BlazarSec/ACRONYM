@@ -5,7 +5,7 @@ class Cmake():
     def __init__(self, name, c3po=True, strip=True, targets={},
                  debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
                  release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
-                 debug_defines={}, release_defines={}):
+                 debug_defines=[], release_defines=['NDEBUG']):
         self.name = '_'.join(name.split())
         self.c3po = c3po
         self.strip = strip
@@ -87,13 +87,13 @@ if(GIT_FOUND AND EXISTS "${{PROJECT_SOURCE_DIR}}/.git")
         endif()
     endif()
 endif()
-""".format(self.name, ' '.join(flag for flag in self.debug_flags), ' '.join(flag for flag in self.release_flags))]
+""".format(self.name, ' '.join(self.debug_flags), ' '.join(self.release_flags))]
 
         if self.debug_defines:
-            targetlines.append("set(DEBUG_DEFINES {})".format(' '.join("{}={}".format(k,v) for k,v in self.debug_defines.items())))
+            targetlines.append("set(DEBUG_DEFINES {})".format(' '.join(self.debug_defines)))
 
         if self.release_defines:
-            targetlines.append("set(RELEASE_DEFINES {})".format(' '.join("\"-D{}={}\"".format(k,v) for k,v in self.release_defines.items())))
+            targetlines.append("set(RELEASE_DEFINES {})".format(' '.join(self.release_defines)))
 
         cmakelines.append(dr_check("add_definitions(${DEBUG_DEFINES})",
                                     "add_definitions(${RELEASE_DEFINES})"))
@@ -107,7 +107,7 @@ endif()
 
 
 class Target():
-    def __init__(self, name, strip=True, c3po=True, files=[], libraries=[], includes=[], debug_flags=[], debug_defines={}, release_flags=[], release_defines={}):
+    def __init__(self, name, strip=True, c3po=True, files=[], libraries=[], includes=[], debug_flags=[], debug_defines=[], release_flags=[], release_defines=[]):
         self.name = '_'.join(name.split())
         self.strip = strip
         self.c3po = c3po
@@ -174,16 +174,16 @@ rdefs: {}
             targetlines.append("add_dependencies(strip_{0} {0})".format(self.name))
 
         if self.debug_flags:
-            targetlines.append("set({}_DEBUG {})".format(self.name, ' '.join(debug for debug in self.debug_flags)))
+            targetlines.append("set({}_DEBUG {})".format(self.name, ' '.join(self.debug_flags)))
 
         if self.release_flags:
-            targetlines.append("set({}_RELEASE {})".format(self.name, ' '.join(release for release in self.release_flags)))
+            targetlines.append("set({}_RELEASE {})".format(self.name, ' '.join(self.release_flags)))
 
         if self.debug_defines:
-            targetlines.append("set({}_DEBUG_DEFINES {})".format(self.name, ' '.join("\"-D{}={}\"".format(k,v) for k,v in self.debug_defines.items())))
+            targetlines.append("set({}_DEBUG_DEFINES {})".format(self.name, ' '.join(self.debug_defines)))
 
         if self.release_defines:
-            targetlines.append("set({}_RELEASE_DEFINES {})".format(self.name, ' '.join("\"-D{}={}\"".format(k,v) for k,v in self.release_defines.items())))
+            targetlines.append("set({}_RELEASE_DEFINES {})".format(self.name, ' '.join(self.release_defines)))
 
         if self.includes:
             targetlines.append("target_include_directories({} PUBLIC {})".format(self.name, ' '.join(include for include in self.includes)))

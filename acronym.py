@@ -35,15 +35,30 @@ if __name__ == "__main__":
             sys.exit(1)
         #target mode
         if args.target:
+            target = None
             print(f"==>target: {args.target}<==")
+            if args.target not in sam.cmake.targets:
+                print(f"creating new target {args.target}")
+                target = sam.cmake.add_target(args.target)
+            else:
+                target = sam.cmake.targets[args.target]
+
             if args.mode == "stat":
-                if args.target not in sam.cmake.targets:
-                    print(f"creating new target {args.target}")
-                    sam.cmake.add_target(args.target)
-                print(str(sam.cmake.targets[args.target]))
+                print(str(target))
             elif args.mode == "add":
                 if args.add in ['debug', 'release']:
                     print(f"adding {args.add} {args.type} {args.option}")
+                    if args.add == 'debug':
+                        if args.type == 'flag':
+                            target.debug_flags.extend(args.option)
+                        else:
+                            target.debug_defines.extend(args.option)
+                    else:
+                        if args.type == 'flag':
+                            target.release_flags.extend(args.option)
+                        else:
+                            target.release_defines.extend(args.option)
+
                 else:
                     print(f"adding {args.add} {args.option}")
             elif args.mode == "set":
