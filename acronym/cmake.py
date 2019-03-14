@@ -100,7 +100,7 @@ endif()
 
         for target in self.targets:
             cmakelines.append("")
-            cmakelines.append(target.compile())
+            cmakelines.append(self.targets[target].compile())
 
         cmakelines.append("")
         return '\n'.join(cmakelines)

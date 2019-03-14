@@ -8,6 +8,7 @@ from acronym.args import *
 #TODO switch prints to use the exisitng logging interface
 if __name__ == "__main__":
     args = Args(sys.argv)
+    sam = None
     print(f"==>{args.mode}<==")
     if args.mode == "test":
         suite = unittest.TestSuite()
@@ -17,6 +18,7 @@ if __name__ == "__main__":
         print(runner.run(suite))
     elif args.mode == "help":
         args_help()
+        sys.exit(0)
     elif args.mode == "init":
         print(f"generating in {args.name}")
         sam = Sample.unpickle_from(args.name, args.path)
@@ -25,8 +27,6 @@ if __name__ == "__main__":
         else:
             sam = Sample(args.path, args.name)
         sam.gen_scaffold()
-        sam.gen_cmake()
-        sam.pickle()
     else:
         print(f"loading '{args.path}'")
         sam = Sample.unpickle_from(args.path)
@@ -35,12 +35,12 @@ if __name__ == "__main__":
             sys.exit(1)
         #target mode
         if args.target:
-            print(f"target {args.target}")
+            print(f"==>{args.target}<==")
             if args.mode == "stat":
-                if args.target in sam.cmake.targets:
-                    print(str(sam.cmake.targets[args.target]))
-                else:
-                    print("target not found in cmake")
+                if args.target not in sam.cmake.targets:
+                    print(f"creating new target {args.target}")
+                    sam.cmake.add_target(args.target)
+                print(str(sam.cmake.targets[args.target]))
             elif args.mode == "add":
                 print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
@@ -55,6 +55,10 @@ if __name__ == "__main__":
                 print(f"adding {args.add} {args.type} {args.option}")
             elif args.mode == "set":
                 print(f"setting {args.set} to {args.state}")
+
+    if sam:
+        sam.gen_cmake()
+        sam.pickle()
 
 '''
     parser = argparse.ArgumentParser(description="ACRONYM")

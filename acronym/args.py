@@ -16,11 +16,12 @@ interface:
         {a}dd {debug, release} {flag, define} <option>
         {a}dd <target>
         <target>
-            -prints stats and target specific setup
-        <target> {a}dd {f}ile <path>
-        <target> {a}dd {l}ibrary <name>
-        <target> {a}dd {i}nclude <path>
-        <target> {a}dd {debug, release} {flag, define} <option>
+            -first run creates new target
+            -print stats and target specific setup
+        <target> {a}dd {f}ile <path ...>
+        <target> {a}dd {l}ibrary <names ...>
+        <target> {a}dd {i}nclude <paths ...>
+        <target> {a}dd {debug, release} {flag, define} <options ...>
         <target> {s}et {c3po, strip} {on, off}
     <path> {i}nit <name>
 ''')
@@ -57,7 +58,7 @@ class Args:
             self.path = "./"
 
         # no args or stat requested
-        if len(argv) == 0:
+        if not argv:
             self.mode = "stat"
             return
 
@@ -77,7 +78,7 @@ class Args:
             self.state = (argv[2] == 'on')
         # ./ add debug flag -g
         elif argv[0] in ['a', 'add']:
-            if len(argv) != 4:
+            if len(argv) < 4:
                 self.mode = "help"
                 return
             self.mode = "add"
@@ -89,7 +90,8 @@ class Args:
                 self.mode = "help"
                 return
             self.type = 'flag' if argv[2] in 'flag' else 'define'
-            self.option = argv[3]
+            #collect all additional flags
+            self.option = argv[3:]
         else:
             #handle target based configs
 
@@ -116,7 +118,7 @@ class Args:
                     return
                 self.state = (argv[3] == 'on')
             elif argv[1] in ['a', 'add']:
-                if len(argv) != 5:
+                if len(argv) < 5:
                     self.mode = "help"
                     return
                 self.mode = "add"
@@ -128,7 +130,8 @@ class Args:
                     self.mode = "help"
                     return
                 self.type = 'flag' if argv[3] in 'flag' else 'define'
-                self.option = argv[4]
+                #collect all additional flags
+                self.option = argv[4:]
             else:
                 self.mode = "help"
 
@@ -146,19 +149,24 @@ class ArgsTest(unittest.TestCase):
         a = Args(["test.py", "./"])
         self.assertEquals(a.mode, "stat")
 
-        a = Args(["test.py", "./", "not something useful"])
-        self.assertEquals(a.mode, "help")
+        a = Args(["test.py", "./", "main"])
+        self.assertEquals(a.mode, "stat")
+        self.assertEquals(a.target, "main")
 
 
     def test_add(self):
         a = Args(["test.py", "a", "d", "f", "-g"])
         self.assertEquals(a.mode, "add")
+        self.assertEquals(a.add, "debug")
+        self.assertEquals(a.type, "flag")
 
         a = Args(["test.py", "a"])
         self.assertEquals(a.mode, "help")
 
         a = Args(["test.py", "add", "debug", "flag", "-g"])
         self.assertEquals(a.mode, "add")
+        self.assertEquals(a.add, "debug")
+        self.assertEquals(a.type, "flag")
 
         a = Args(["test.py", "add"])
         self.assertEquals(a.mode, "help")
@@ -167,12 +175,16 @@ class ArgsTest(unittest.TestCase):
     def test_set(self):
         a = Args(["test.py", "s", "c", "on"])
         self.assertEquals(a.mode, "set")
+        self.assertEquals(a.set, "c3po")
+        self.assertEquals(a.state, True)
 
         a = Args(["test.py", "s"])
         self.assertEquals(a.mode, "help")
 
-        a = Args(["test.py", "set", "c3po", "on"])
+        a = Args(["test.py", "set", "c3po", "off"])
         self.assertEquals(a.mode, "set")
+        self.assertEquals(a.set, "c3po")
+        self.assertEquals(a.state, False)
 
         a = Args(["test.py", "set"])
         self.assertEquals(a.mode, "help")
