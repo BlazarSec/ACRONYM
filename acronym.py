@@ -63,6 +63,10 @@ if __name__ == "__main__":
                     print(f"adding {args.add} {args.option}")
             elif args.mode == "set":
                 print(f"setting {args.set} {args.state}")
+                if args.set == 'c3po':
+                    target.c3po = args.state
+                else:
+                    target.strip = args.state
 
         #global mode
         else:
@@ -71,8 +75,22 @@ if __name__ == "__main__":
                 print(str(sam.cmake))
             elif args.mode == "add":
                 print(f"adding {args.add} {args.type} {args.option}")
+                if args.add == 'debug':
+                    if args.type == 'flag':
+                        sam.cmake.debug_flags.extend(args.option)
+                    else:
+                        sam.cmake.debug_defines.extend(args.option)
+                else:
+                    if args.type == 'flag':
+                        sam.cmake.release_flags.extend(args.option)
+                    else:
+                        sam.cmake.release_defines.extend(args.option)
             elif args.mode == "set":
                 print(f"setting {args.set} to {args.state}")
+                if args.set == 'c3po':
+                    sam.cmake.c3po = args.state
+                else:
+                    sam.cmake.strip = args.state
 
     if sam:
         if args.mode not in ['help', 'stat']:
