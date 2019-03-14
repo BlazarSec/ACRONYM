@@ -58,8 +58,3 @@ class Sample():
     def gen_scaffold(self):
         scaffold(self.path, self.name, c3po=self.c3po)
 
-    # build a string to use to display the currently selected sample
-    # TODO indicate if changes need saving or not
-    def prompt(self):
-        return "[{}]".format(self.name)
-
