@@ -61,6 +61,22 @@ if __name__ == "__main__":
 
                 else:
                     print(f"adding {args.add} {args.option}")
+                    if args.add == 'debug':
+                        if args.type == 'flag':
+                            target.debug_flags.extend(args.option)
+                        else:
+                            target.debug_defines.extend(args.option)
+                    elif args.add == 'release':
+                        if args.type == 'flag':
+                            target.release_flags.extend(args.option)
+                        else:
+                            target.release_defines.extend(args.option)
+                    elif args.add == 'file':
+                        target.files.extend(args.option)
+                    elif args.add == 'include':
+                        target.includes.extend(args.option)
+                    elif args.add == 'library':
+                        target.libraries.extend(args.option)
             elif args.mode == "set":
                 print(f"setting {args.set} {args.state}")
                 if args.set == 'c3po':
