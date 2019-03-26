@@ -81,8 +81,6 @@ if __name__ == "__main__":
                 print(f"setting {args.set} {args.state}")
                 if args.set == 'c3po':
                     target.c3po = args.state
-                else:
-                    target.strip = args.state
 
         #global mode
         else:
@@ -105,8 +103,6 @@ if __name__ == "__main__":
                 print(f"setting {args.set} to {args.state}")
                 if args.set == 'c3po':
                     sam.cmake.c3po = args.state
-                else:
-                    sam.cmake.strip = args.state
 
     if sam:
         if args.mode not in ['help', 'stat']:
@@ -121,13 +117,12 @@ if __name__ == "__main__":
     parser.add_argument("mode", help="what operation to perform", choices=["gen","status"])
     parser.add_argument("--scan", help="when rebuilding, scan the specified folder for sources, defaults to 'src/'", nargs='?', const='src/')
     parser.add_argument("--c3po", help="enable c3po additional build steps", action='store_true')
-    parser.add_argument("--strip", help="enable strip additional build step", action='store_true')
     parser.add_argument("--link", help="add additional linking options comma seperated, defaults to 'rt,pthreads'", nargs='?', const='rt,pthread')
 
     args = parser.parse_args()
 
     if args.mode == "gen":
-        sam = Sample(args.name, args.path, c3po=args.c3po, strip=args.strip)
+        sam = Sample(args.name, args.path, c3po=args.c3po)
         if args.scan:
             scan_path = os.path.join(sam.path, args.scan)
             paths = [os.path.join(args.scan, file) for file in os.listdir(scan_path) if os.path.isfile(os.path.join(scan_path, file)) and file.endswith(".c")]

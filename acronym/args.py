@@ -12,7 +12,7 @@ interface:
     <path> {st}at
         -prints stats and cmake setup
     <path> [modifications, ...]
-        {s}et {c3po, strip} {on, off}
+        {s}et {c3po} {on, off}
         {a}dd {debug, release} {flag, define} <option>
         {a}dd <target>
         <target>
@@ -22,7 +22,7 @@ interface:
         <target> {a}dd {l}ibrary <names ...>
         <target> {a}dd {i}nclude <paths ...>
         <target> {a}dd {debug, release} {flag, define} <options ...>
-        <target> {s}et {c3po, strip} {on, off}
+        <target> {s}et {c3po} {on, off}
     {i}nit <name> <path>
 ''')
 
@@ -70,10 +70,10 @@ class Args:
                 self.mode = "help"
                 return
             self.mode = "set"
-            if argv[1] not in ['c', 'c3po', 's', 'strip']:
+            if argv[1] not in ['c', 'c3po']:
                 self.mode = "help"
                 return
-            self.set = 'c3po' if argv[1] in 'c3po' else 'strip'
+            self.set = 'c3po' if argv[1] in 'c3po' else ''
             if argv[2] not in ['on', 'off']:
                 self.mode = "help"
                 return
@@ -111,10 +111,10 @@ class Args:
                     return
                 self.mode = "set"
 
-                if argv[2] not in ['c3po', 'strip']:
+                if argv[2] not in ['c3po']:
                     self.mode = "help"
                     return
-                self.set = 'c3po' if argv[2] in ['c', 'c3po'] else 'strip'
+                self.set = 'c3po' if argv[2] in ['c', 'c3po'] else ''
 
                 if argv[3] not in ['on', 'off']:
                     self.mode = "help"

@@ -2,13 +2,12 @@ def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
 class Cmake():
-    def __init__(self, name, c3po=True, strip=True, targets={},
+    def __init__(self, name, c3po=True, targets={},
                  debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
                  release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
                  debug_defines=[], release_defines=['NDEBUG']):
         self.name = '_'.join(name.split())
         self.c3po = c3po
-        self.strip = strip
         self.targets = targets
         self.debug_flags = debug_flags
         self.release_flags = release_flags
@@ -16,7 +15,7 @@ class Cmake():
         self.release_defines = release_defines
 
     def add_target(self, name, **kwargs):
-        self.targets[name] = Target(name, c3po=self.c3po, strip=self.strip, **kwargs)
+        self.targets[name] = Target(name, c3po=self.c3po, **kwargs)
         return self.targets[name]
 
     def __str__(self):
@@ -26,7 +25,6 @@ targets: [
     {}
 ]
 c3po: {}
-strip: {}
 dflags: {}
 rflags: {}
 ddefs: {}
@@ -35,7 +33,6 @@ rdefs: {}
     self.name,
     ',\n'.join("\n    ".join(str(self.targets[t]).split('\n')) for t in self.targets),
     self.c3po,
-    self.strip,
     self.debug_flags,
     self.release_flags,
     self.debug_defines,
@@ -90,10 +87,10 @@ endif()
 """.format(self.name, ' '.join(self.debug_flags), ' '.join(self.release_flags))]
 
         if self.debug_defines:
-            targetlines.append("set(DEBUG_DEFINES {})".format(' '.join(self.debug_defines)))
+            cmakelines.append("set(DEBUG_DEFINES {})".format(' '.join(self.debug_defines)))
 
         if self.release_defines:
-            targetlines.append("set(RELEASE_DEFINES {})".format(' '.join(self.release_defines)))
+            cmakelines.append("set(RELEASE_DEFINES {})".format(' '.join(self.release_defines)))
 
         cmakelines.append(dr_check("add_definitions(${DEBUG_DEFINES})",
                                     "add_definitions(${RELEASE_DEFINES})"))
@@ -107,9 +104,8 @@ endif()
 
 
 class Target():
-    def __init__(self, name, strip=True, c3po=True, files=[], libraries=[], includes=[], debug_flags=[], debug_defines=[], release_flags=[], release_defines=[]):
+    def __init__(self, name,  c3po=True, files=[], libraries=[], includes=[], debug_flags=[], debug_defines=[], release_flags=[], release_defines=[]):
         self.name = '_'.join(name.split())
-        self.strip = strip
         self.c3po = c3po
         self.files = files
         self.libraries= libraries
@@ -122,7 +118,6 @@ class Target():
     def __str__(self):
         return '''(
 >{}<
-strip: {}
 c3po: {}
 files: {}
 libs: {}
@@ -133,7 +128,6 @@ ddefs: {}
 rdefs: {}
 )'''.format(
     self.name,
-    self.strip,
     self.c3po,
     self.files,
     self.libraries,
@@ -159,19 +153,8 @@ rdefs: {}
             targetlines.append('add_custom_target(gen_{0} ALL COMMAND python3 "${{PROJECT_SOURCE_DIR}}/c3po.py" "build" "-s" "${{PROJECT_SOURCE_DIR}}/src" "-o" "${{PROJECT_SOURCE_DIR}}/gen")'.format(self.name))
             targetlines.append("add_dependencies(gen_{0} {0}d)".format(self.name))
             targetlines.append("add_dependencies({0} gen_{0})".format(self.name))
-            #c3po /and/ strip
-            if self.strip:
-                targetlines.append('add_custom_target(strip_{0} ALL COMMAND strip -R .comment -R .note -R .note.ABI-tag -R .note.gnu.build-id -R .gnu.hash -R .gnu.version "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
-                targetlines.append("add_dependencies(strip_{0} {0})".format(self.name))
-                targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
-                #post processing needs to happen after the strip if it exists
-                targetlines.append("add_dependencies(post_{0} strip_{0})".format(self.name))
-            else:
-                targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
-                targetlines.append("add_dependencies(post_{0} {0})".format(self.name))
-        elif self.strip:
-            targetlines.append('add_custom_target(strip_{0} ALL COMMAND strip -R .comment -R .note -R .note.ABI-tag -R .note.gnu.build-id -R .gnu.hash -R .gnu.version "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
-            targetlines.append("add_dependencies(strip_{0} {0})".format(self.name))
+            targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
+            targetlines.append("add_dependencies(post_{0} {0})".format(self.name))
 
         if self.debug_flags:
             targetlines.append("set({}_DEBUG {})".format(self.name, ' '.join(self.debug_flags)))
