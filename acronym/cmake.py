@@ -4,7 +4,7 @@ def dr_check(debug, release):
 class Cmake():
     def __init__(self, name, c3po=True, targets={},
                  debug_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -g -O0 -fsanitize=address -fno-omit-frame-pointer".split()],
-                 release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto -DNDEBUG".split()],
+                 release_flags=[f for f in "-masm=intel -Wall -Wextra -Wno-unknown-pragmas -Ofast -s -fno-ident -march=native -flto".split()],
                  debug_defines=[], release_defines=['NDEBUG']):
         self.name = '_'.join(name.split())
         self.c3po = c3po
@@ -87,10 +87,10 @@ endif()
 """.format(self.name, ' '.join(self.debug_flags), ' '.join(self.release_flags))]
 
         if self.debug_defines:
-            cmakelines.append("set(DEBUG_DEFINES {})".format(' '.join(self.debug_defines)))
+            cmakelines.append("set(DEBUG_DEFINES {})".format(' '.join("-D{}".format(r) for r in self.debug_defines)))
 
         if self.release_defines:
-            cmakelines.append("set(RELEASE_DEFINES {})".format(' '.join(self.release_defines)))
+            cmakelines.append("set(RELEASE_DEFINES {})".format(' '.join("-D{}".format(r) for r in self.release_defines)))
 
         cmakelines.append(dr_check("add_definitions(${DEBUG_DEFINES})",
                                     "add_definitions(${RELEASE_DEFINES})"))
@@ -150,10 +150,10 @@ rdefs: {}
 
         if self.c3po:
             targetlines.append("add_executable({0}d ${{{0}_SOURCES}})".format(self.name))
-            targetlines.append('add_custom_target(gen_{0} ALL COMMAND python3 "${{PROJECT_SOURCE_DIR}}/c3po.py" "build" "-s" "${{PROJECT_SOURCE_DIR}}/src" "-o" "${{PROJECT_SOURCE_DIR}}/gen")'.format(self.name))
+            targetlines.append('add_custom_target(gen_{0} ALL COMMAND python3 "${{PROJECT_SOURCE_DIR}}/c3po/c3po.py" "build" "-s" "${{PROJECT_SOURCE_DIR}}/src" "-o" "${{PROJECT_SOURCE_DIR}}/gen")'.format(self.name))
             targetlines.append("add_dependencies(gen_{0} {0}d)".format(self.name))
             targetlines.append("add_dependencies({0} gen_{0})".format(self.name))
-            targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
+            targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
             targetlines.append("add_dependencies(post_{0} {0})".format(self.name))
 
         if self.debug_flags:
@@ -163,10 +163,10 @@ rdefs: {}
             targetlines.append("set({}_RELEASE {})".format(self.name, ' '.join(self.release_flags)))
 
         if self.debug_defines:
-            targetlines.append("set({}_DEBUG_DEFINES {})".format(self.name, ' '.join(self.debug_defines)))
+            targetlines.append("set({}_DEBUG_DEFINES {})".format(self.name, ' '.join("-D{}".format(r) for r in self.debug_defines)))
 
         if self.release_defines:
-            targetlines.append("set({}_RELEASE_DEFINES {})".format(self.name, ' '.join(self.release_defines)))
+            targetlines.append("set({}_RELEASE_DEFINES {})".format(self.name, ' '.join("-D{}".format(r) for r in self.release_defines)))
 
         if self.includes:
             targetlines.append("target_include_directories({} PUBLIC {})".format(self.name, ' '.join(include for include in self.includes)))

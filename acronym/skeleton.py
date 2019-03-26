@@ -55,6 +55,9 @@ def scaffold(path, project_name, c3po=True):
         for file in [os.path.join(gen_path, file) for file in os.listdir(src_path) if os.path.isfile(os.path.join(src_path, file)) and (file.endswith(".c") or file.endswith(".h"))]:
             #create them blank
             open(file, 'a').close()
+        if len(os.listdir(c3po_path)) == 0:
+            subprocess.call(['git', 'clone', 'https://github.com/isaacmorneau/C-3PO', c3po_path])
+
 
     gitignore_path = os.path.join(path, ".gitignore")
     git_path = os.path.join(path, ".git")
