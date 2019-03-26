@@ -5,7 +5,14 @@ from acronym.sample import *
 from acronym.cmake import *
 from acronym.args import *
 
+#demo run
+#~/code/ACRONYM/acronym.py init testing ./
+#cat >> testing/src/main.c
+#~/code/ACRONYM/acronym.py ./testing/ main add file src/main.c
+
 #TODO switch prints to use the exisitng logging interface
+#TODO fix the pathing to allow running externally and from in the dir
+
 if __name__ == "__main__":
     args = Args(sys.argv)
     sam = None
