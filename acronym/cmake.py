@@ -72,22 +72,6 @@ if(ipo_supported)
 else()
     message(STATUS "IPO / LTO not supported: <${{error}}>")
 endif()
-
-#update/pull git submodules
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${{PROJECT_SOURCE_DIR}}/.git")
-# Update submodules as needed
-    option(GIT_SUBMODULE "Check submodules during build" ON)
-    if(GIT_SUBMODULE)
-        message(STATUS "Submodule update")
-        execute_process(COMMAND ${{GIT_EXECUTABLE}} submodule update --init --recursive
-                        WORKING_DIRECTORY ${{CMAKE_CURRENT_SOURCE_DIR}}
-                        RESULT_VARIABLE GIT_SUBMOD_RESULT)
-        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-            message(FATAL_ERROR "git submodule update --init failed with ${{GIT_SUBMOD_RESULT}}, please checkout submodules")
-        endif()
-    endif()
-endif()
 """.format(self.name, ' '.join(self.debug_flags), ' '.join(self.release_flags))]
 
         if self.debug_defines:
@@ -227,17 +211,17 @@ class CmakeTest(unittest.TestCase):
     def test_basic_compile(self):
         c = Cmake('test')
         ho = hashlib.md5(c.compile().encode())
-        self.assertEquals(ho.hexdigest(), '6d8300f23b19dfb872118720448ea313')
+        self.assertEquals(ho.hexdigest(), '08d84cfabc29aa07ab0affe711fb5967')
 
     def test_basic_target_compile(self):
         c = Cmake('test')
         c.add_target('main')
         ho = hashlib.md5(c.compile().encode())
-        self.assertEquals(ho.hexdigest(), 'f752f31d17fa92a6b54a29d62852a95a')
+        self.assertEquals(ho.hexdigest(), 'be32e261a99f1f6b9f9eb73d88d142f8')
 
     def test_adv_target_compile(self):
         c = Cmake('test', False)
         t = c.add_target('main')
         t.files.append('src/main.c')
         ho = hashlib.md5(c.compile().encode())
-        self.assertEquals(ho.hexdigest(), '6d8300f23b19dfb872118720448ea313')
+        self.assertEquals(ho.hexdigest(), '08d84cfabc29aa07ab0affe711fb5967')
