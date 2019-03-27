@@ -1,3 +1,7 @@
+import unittest
+import sys
+import hashlib
+
 def dr_check(debug, release):
     return """if (CMAKE_BUILD_TYPE EQUAL "DEBUG")\n    {}\nelse()\n    {}\nendif()\n""".format(debug, release)
 
@@ -181,3 +185,59 @@ rdefs: {}
                                     "target_compile_definitions({0} PRIVATE ${{{0}_RELEASE_DEFINES}})".format(self.name)))
 
         return "\n".join(targetlines)
+
+class CmakeTest(unittest.TestCase):
+    #each of the hash values was tested manually first and now unit tested to ensure it doesnt have regressions
+
+    def test_creation(self):
+        c = Cmake('test')
+        self.assertEquals(c.name, 'test')
+
+    def test_strinifya(self):
+        c = Cmake('test')
+        ho = hashlib.md5(str(c).encode())
+        self.assertEquals(ho.hexdigest(), 'a32edd22af6277f4800c0eeda1c24a08')
+
+    def test_strinifyb(self):
+        c = Cmake('test', False)
+        ho = hashlib.md5(str(c).encode())
+        self.assertEquals(ho.hexdigest(), '5fc03edffe2f93bc317ad14a0071d6fc')
+
+    def test_target_creationa(self):
+        c = Cmake('test')
+        c.add_target('main')
+        self.assertTrue(len(c.targets) > 0)
+
+    def test_target_creationb(self):
+        t = Target('main')
+        self.assertEquals(t.name, 'main')
+
+    def test_target_strinifya(self):
+        c = Cmake('test')
+        c.add_target('main')
+        ho = hashlib.md5(str(c).encode())
+        self.assertEquals(ho.hexdigest(), 'a32edd22af6277f4800c0eeda1c24a08')
+
+    def test_target_strinifyb(self):
+        c = Cmake('test', False)
+        c.add_target('main')
+        ho = hashlib.md5(str(c).encode())
+        self.assertEquals(ho.hexdigest(), 'b4029a3e960e40c82b3cbdc95c5f5fa3')
+
+    def test_basic_compile(self):
+        c = Cmake('test')
+        ho = hashlib.md5(c.compile().encode())
+        self.assertEquals(ho.hexdigest(), '6d8300f23b19dfb872118720448ea313')
+
+    def test_basic_target_compile(self):
+        c = Cmake('test')
+        c.add_target('main')
+        ho = hashlib.md5(c.compile().encode())
+        self.assertEquals(ho.hexdigest(), 'f752f31d17fa92a6b54a29d62852a95a')
+
+    def test_adv_target_compile(self):
+        c = Cmake('test', False)
+        t = c.add_target('main')
+        t.files.append('src/main.c')
+        ho = hashlib.md5(c.compile().encode())
+        self.assertEquals(ho.hexdigest(), '6d8300f23b19dfb872118720448ea313')

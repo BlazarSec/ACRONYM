@@ -21,6 +21,7 @@ if __name__ == "__main__":
         suite = unittest.TestSuite()
         results = unittest.TestResult()
         suite.addTest(unittest.makeSuite(ArgsTest))
+        suite.addTest(unittest.makeSuite(CmakeTest))
         runner = unittest.TextTestRunner()
         print(runner.run(suite))
     elif args.mode == "help":
