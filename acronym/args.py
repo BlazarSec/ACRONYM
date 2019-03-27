@@ -152,66 +152,88 @@ class Args:
 
 
 class ArgsTest(unittest.TestCase):
-    def test_help(self):
+    def test_helpa(self):
         a = Args(["test.py"])
         self.assertEquals(a.mode, "help")
 
+    def test_helpb(self):
         a = Args(["test.py", "help"])
         self.assertEquals(a.mode, "help")
 
 
-    def test_stat(self):
+    def test_stata(self):
         a = Args(["test.py", "./"])
         self.assertEquals(a.mode, "stat")
 
+    def test_statb(self):
         a = Args(["test.py", "./", "main"])
         self.assertEquals(a.mode, "stat")
         self.assertEquals(a.target, "main")
 
 
-    def test_add(self):
+    def test_adda(self):
         a = Args(["test.py", "a", "d", "f", "-g"])
         self.assertEquals(a.mode, "add")
         self.assertEquals(a.add, "debug")
         self.assertEquals(a.type, "flag")
 
+    def test_addb(self):
         a = Args(["test.py", "a"])
         self.assertEquals(a.mode, "help")
 
+    def test_addc(self):
         a = Args(["test.py", "add", "debug", "flag", "-g"])
         self.assertEquals(a.mode, "add")
         self.assertEquals(a.add, "debug")
         self.assertEquals(a.type, "flag")
 
+    def test_addd(self):
         a = Args(["test.py", "add"])
         self.assertEquals(a.mode, "help")
 
 
-    def test_set(self):
+    def test_seta(self):
         a = Args(["test.py", "s", "c", "on"])
         self.assertEquals(a.mode, "set")
         self.assertEquals(a.set, "c3po")
         self.assertEquals(a.state, True)
 
+    def test_setb(self):
         a = Args(["test.py", "s"])
         self.assertEquals(a.mode, "help")
 
+    def test_setc(self):
         a = Args(["test.py", "set", "c3po", "off"])
         self.assertEquals(a.mode, "set")
         self.assertEquals(a.set, "c3po")
         self.assertEquals(a.state, False)
 
+    def test_setd(self):
         a = Args(["test.py", "set"])
         self.assertEquals(a.mode, "help")
 
-    def test_file(self):
+    def test_filea(self):
         a = Args(["~/test", "main", "add", "file", "src/test.c"])
         self.assertEquals(a.mode, "add")
         self.assertEquals(a.add, "file")
         self.assertEquals(a.option, ["src/test.c"])
 
+    def test_fileb(self):
         a = Args(["~/test", "main", "add", "file", "src/test.c", "src/main.c"])
         self.assertEquals(a.mode, "add")
         self.assertEquals(a.add, "file")
         self.assertEquals(a.option, ["src/test.c", "src/main.c"])
+
+    def test_target_good(self):
+        a = Args(["~/test", "main"])
+        self.assertEquals(a.target, "main")
+        self.assertEquals(a.mode, "stat")
+
+    def test_target_bad(self):
+        a = Args(["~/test", "main", "set"])
+        self.assertEquals(a.mode, "help")
+
+        a = Args(["~/test", "main", "what"])
+        self.assertEquals(a.mode, "help")
+
 
