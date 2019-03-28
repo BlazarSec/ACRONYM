@@ -4,6 +4,7 @@
 import os
 import sys
 import subprocess
+import shutil
 from .logging import iprint, eprint, dprint, wprint, reset_print
 
 def contains_end(value, endings):
@@ -57,6 +58,8 @@ def scaffold(path, project_name, c3po=True):
             open(file, 'a').close()
         if len(os.listdir(c3po_path)) == 0:
             subprocess.call(['git', 'clone', 'https://github.com/isaacmorneau/C-3PO', c3po_path])
+            shutil.copyfile(os.path.join(c3po_path, "src/c3po.c"), os.path.join(src_path, "c3po.c"))
+            shutil.copyfile(os.path.join(c3po_path, "src/c3po.h"), os.path.join(src_path, "c3po.h"))
 
 
     gitignore_path = os.path.join(path, ".gitignore")

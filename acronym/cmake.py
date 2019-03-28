@@ -134,15 +134,26 @@ rdefs: {}
 
         targetlines.append("set({}_SOURCES\n    {})".format(self.name, '\n    '.join("\"{}\"".format(file) for file in self.files)))
 
-        targetlines.append("add_executable({0} ${{{0}_SOURCES}})".format(self.name))
 
         if self.c3po:
             targetlines.append("add_executable({0}d ${{{0}_SOURCES}})".format(self.name))
+
+            targetlines.append("set(CMAKE_ENABLE_EXPORTS 1)")
+
+            targetlines.append("set({}_GEN_SOURCES\n    {})".format(self.name, '\n    '.join("\"{}\"".format(file.replace("src/", "gen/")) for file in (self.files + ['gen/c3po.c']))))
+            targetlines.append("add_executable({0} ${{{0}_GEN_SOURCES}})".format(self.name))
+            targetlines.append("target_compile_definitions({} PRIVATE C3PO)".format(self.name))
+
             targetlines.append('add_custom_target(gen_{0} ALL COMMAND python3 "${{PROJECT_SOURCE_DIR}}/c3po/c3po.py" "build" "-s" "${{PROJECT_SOURCE_DIR}}/src" "-o" "${{PROJECT_SOURCE_DIR}}/gen")'.format(self.name))
             targetlines.append("add_dependencies(gen_{0} {0}d)".format(self.name))
             targetlines.append("add_dependencies({0} gen_{0})".format(self.name))
+
+            targetlines.append('set_directory_properties(PROPERTY ADDITIONAL_MAKE_CLEAN_FILES "${PROJECT_SOURCE_DIR}/gen")')
+
             targetlines.append('add_custom_target(post_{0} ALL COMMAND python3 ${{PROJECT_SOURCE_DIR}}/c3po/c3po.py "post" "-s" "${{PROJECT_BINARY_DIR}}/{0}")'.format(self.name))
             targetlines.append("add_dependencies(post_{0} {0})".format(self.name))
+        else:
+            targetlines.append("add_executable({0} ${{{0}_SOURCES}})".format(self.name))
 
         if self.debug_flags:
             targetlines.append("set({}_DEBUG {})".format(self.name, ' '.join(self.debug_flags)))
