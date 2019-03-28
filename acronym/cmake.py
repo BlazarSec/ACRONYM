@@ -228,7 +228,7 @@ class CmakeTest(unittest.TestCase):
         c = Cmake('test')
         c.add_target('main')
         ho = hashlib.md5(c.compile().encode())
-        self.assertEquals(ho.hexdigest(), 'be32e261a99f1f6b9f9eb73d88d142f8')
+        self.assertEquals(ho.hexdigest(), '27f081506208be43c39c296885f5617e')
 
     def test_adv_target_compile(self):
         c = Cmake('test', False)
